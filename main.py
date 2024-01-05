@@ -32,7 +32,21 @@ class UI:
         self.attacks[self.screen.get_input("Witch attack you wanna run?", int)]()
 
     def null_probe_response(self):
-        print("null_probe_response")
+        self.screen.clean()
+
+        Freq = self.__ask_Freq()
+
+        self.devices = self.sniffer.scan_devices_(Freq)  # need all devices here (кроме точек доступа)
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "MAC", "Freq", "Channel"], self.devices,
+                               '''Null Probe Response Attack\n'''
+                               '''Choose device to be attacked''')
+        target_device = self.screen.get_input("Choose device to be attacked (type its number):")
+        print(target_device)
+
+        self.run_attack("null_probe_response", target_device)
 
     def rogue_twin(self):
         print("rogue_twin")
@@ -65,8 +79,10 @@ class UI:
         sniff_proc = multiprocessing.Process(target=getattr(self.sniffer, attack), args=(self.nets[target_net][2],
                                                                                          self.nets[target_net][3],
                                                                                          self.nets[target_net][4]))
-        attack_proc.start()
         sniff_proc.start()
+        time.sleep(5)
+        attack_proc.start()
+
 
         while True:
             if keyboard.is_pressed("q"):
