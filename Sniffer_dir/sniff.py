@@ -6,7 +6,7 @@ from pathlib import Path
 import datetime
 import threading
 import queue
-from iface import *
+from Sniffer_dir.iface import *
 
 
 			
