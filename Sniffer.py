@@ -15,8 +15,8 @@ class sniffer:
     def __del__(self):
         self.screen = ""
 
-    def rts_flood(self, BSSID, Freq, Channel):
-        sniffer_main.sniffer_start(self.control_int, BSSID, Channel)
+    def rts_flood(self, target_addr, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
+        sniffer_main.sniffer_start(self.control_int, attacking_addr, target_addr, Channel)
 
     def __PHY_scan(self, freq):
         nets = []
