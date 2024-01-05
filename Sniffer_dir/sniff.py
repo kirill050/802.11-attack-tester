@@ -7,6 +7,7 @@ import datetime
 import threading
 import queue
 from Sniffer_dir.iface import *
+from Sniffer_dir.common import *
 
 
 			
