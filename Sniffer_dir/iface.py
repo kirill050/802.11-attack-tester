@@ -1,5 +1,5 @@
-from common import *
-from constants import *
+from Sniffer_dir.common import *
+from Sniffer_dir.constants import *
 from pathlib import Path
 
 
