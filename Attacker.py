@@ -18,6 +18,8 @@ from scapy import *
 from scapy.layers.dot11 import RadioTap, Dot11, conf
 from scapy.sendrecv import sendp
 
+from Sniffer_dir import FakeAP
+
 class attacker:
     def __init__(self, attack_int):
         self.attack_int = attack_int
@@ -33,7 +35,7 @@ class attacker:
     #         print("ABCD")
     #         time.sleep(1)
 
-    def rts_flood(self, BSSID, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
+    def rts_flood(self, SSID, BSSID, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
         self.screen = Drawer.drawer()
 
         self.attack_int = self.__start_monitor_mode(self.attack_int)
@@ -63,8 +65,16 @@ class attacker:
     def null_probe_response(self):
         print("null_probe_response")
 
-    def rogue_twin(self):
-        print("rogue_twin")
+    def rogue_twin(self, SSID, BSSID, Freq, Channel):
+        self.screen = Drawer.drawer()
+
+        self.attack_int = self.__start_monitor_mode(self.attack_int)
+        if Freq == "0":  # 2.4 GHz
+            self.__change_channel(self.attack_int, Channel) #TODO Сделать различие от диапазона частот
+
+            ap = FakeAP.AP(wirelessiface=self.attack_int, ssid=SSID, channel=Channel)
+            ap.launch()
+
 
 
     def __GetInterfaces(self):

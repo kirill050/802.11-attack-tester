@@ -25,7 +25,7 @@ class UI:
         raws = [["0", "RTS flood",
                  "Floods RTS/CTS frames to reserve the RF medium and force other wireless devices sharing the RF medium to hold back their transmissions"]]
         raws.append(["1", "Null Probe Response", "❌"])
-        raws.append(["2", "Rogue twin", "❌"])  # "✅"
+        raws.append(["2", "Rogue twin", "Creates fake AP with the same channel and SSID as target"])  # "✅"
         raws.append(["3", "Coming soon", "..."])
         self.screen.draw_table(["No.", "Name", "Brief descr."], raws)
 
@@ -49,7 +49,21 @@ class UI:
         self.run_attack("null_probe_response", target_device)
 
     def rogue_twin(self):
-        print("rogue_twin")
+        self.screen.clean()
+
+        Freq = self.__ask_Freq()
+
+        self.nets = self.sniffer.scan_nets_(Freq)
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets,
+                               '''RTS Flood Attack\n'''
+                               '''Choose net to be attacked''')
+        target_net = self.screen.get_input("Choose net to be attacked (type its number):")
+        print(target_net)
+
+        self.run_attack("rogue_twin", target_net)
 
     def rts_flood(self):
         self.screen.clean()
@@ -73,10 +87,12 @@ class UI:
         self.screen.print_label()
         self.screen.print_text(f"Attacking {self.nets[target_net][2]} by {attack} (type 'q' to stop)")
 
-        attack_proc = multiprocessing.Process(target=getattr(self.attacker, attack), args=(self.nets[target_net][2],
+        attack_proc = multiprocessing.Process(target=getattr(self.attacker, attack), args=(self.nets[target_net][1],
+                                                                                           self.nets[target_net][2],
                                                                                            self.nets[target_net][3],
                                                                                            self.nets[target_net][4]))
-        sniff_proc = multiprocessing.Process(target=getattr(self.sniffer, attack), args=(self.nets[target_net][2],
+        sniff_proc = multiprocessing.Process(target=getattr(self.sniffer, attack), args=(self.nets[target_net][1],
+                                                                                         self.nets[target_net][2],
                                                                                          self.nets[target_net][3],
                                                                                          self.nets[target_net][4]))
         sniff_proc.start()

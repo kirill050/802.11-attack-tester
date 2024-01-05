@@ -8,13 +8,13 @@ class AP:
 	channel="1"
 	password="1234567890"
 
-	def __init__(self, wirelessiface:str, gatewayiface:str="", ip:str="192.168.5.1",**kwargs):
+	def __init__(self, wirelessiface: str, gatewayiface: str = "", ip: str = "192.168.5.1", **kwargs):
 		self.wirelessiface = wirelessiface
 		self.gatewayiface = gatewayiface
 		self.ip = ip
 		for i in kwargs.keys():
-			if getattr(self,i,None) != None:
-				setattr(self,i,kwargs[i])
+			if getattr(self, i, None) != None:
+				setattr(self, i, kwargs[i])
 
 	def StopAp(self):
 		os.system("pkill -9 -f dnsmasq")

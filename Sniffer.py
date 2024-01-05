@@ -15,7 +15,9 @@ class sniffer:
     def __del__(self):
         self.screen = ""
 
-    def rts_flood(self, target_addr, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
+    def rogue_twin(self, SSID, BSSID, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
+        sniffer_main.sniffer_start(self.control_int, attacking_addr, BSSID, Channel)
+    def rts_flood(self, SSID, target_addr, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
         sniffer_main.sniffer_start(self.control_int, attacking_addr, target_addr, Channel)
 
     def __PHY_scan(self, freq):
