@@ -1,0 +1,2 @@
+INTERFACESPATH = "/sys/class/ieee80211/"
+INTERFACESPATHAPPENDIX = "device/net/"

@@ -1,0 +1,62 @@
+from scapy.all import * 
+import os
+import sys
+from datetime import datetime
+from Sniffer_dir.common import *
+from Sniffer_dir.constants import *
+from pathlib import Path
+import datetime
+import threading
+import queue
+
+
+
+			
+class Sniffer:
+	def __init__(self, interface="wlp1s0"):
+		self.interface = interface
+		self.packets = 0
+
+	def IsMonitor(self):
+		if "mon" in self.interface:  #TODO А если интерфейс не меняет название при переводе в режим монитора?!!!
+			return True
+		else:
+			return False
+
+	def EnableMonitor(self): # возвращает имя интерфейса после его перевода в режим монитора 
+		bash(f"airmon-ng check kill")
+		bash(f"airmon-ng start {self.interface}")
+		for i in self.GetInterfaces():
+			# if "mon" in i and self.interface in i:
+			if self.interface in i:
+				self.interface = i
+				return i
+
+		return None
+
+	def SetInterface(self, interface: str):
+		self.interface = interface
+
+	def SetChannel(self, channel: int = 1):
+		bash(f"iwconfig {self.interface} channel {channel}")
+
+	def GetInterfaces(self):
+		retval = []
+		p = Path(INTERFACESPATH)
+		for i in os.listdir(INTERFACESPATH):
+			for iface in os.listdir(p/i/INTERFACESPATHAPPENDIX):
+				retval.append(iface)
+		return retval
+
+	def exec(self, **kwargs):
+		sniff(iface=self.interface, **kwargs)
+
+
+
+
+
+
+
+
+
+
