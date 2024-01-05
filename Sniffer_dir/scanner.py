@@ -15,7 +15,7 @@ class WIFIScanner:
 				self.networks[str(channel)+str(SSID)+str(BSSID)] = {
 					"SSID": str(SSID),
 					"channel": str(channel),
-					"BSSID" : str(BSSID)
+					"BSSID": str(BSSID)
 				}
 
 	def GetNetworksInfo(self):
