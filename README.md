@@ -1,5 +1,4 @@
 <h1 align=center>802.11 attack tester</h1>
-<h4 align=center>by Tikhonov K. & Dement`ev S.</h4>
 
 The 802.11 attack tester is a multifunctional console application designed 
 to test the effectiveness of the WIDS/WIPS (wireless intrusion detection/prevention system)
