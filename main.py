@@ -122,6 +122,7 @@ if __name__ == "__main__":
         # attack_int =  sys.argv[1]
         # control_int = sys.argv[2]
         print(attack_int, control_int)
+    exit()
 
     signal.signal(signal.SIGINT, signal_handler)
 
