@@ -91,13 +91,3 @@ class AP:
 
 
 
-
-ap = AP(wirelessiface="wlan0",ssid="HelloFriends")
-ap.launch()
-
-
-
-
-
-
-
