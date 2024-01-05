@@ -30,10 +30,9 @@ class attacker:
 
     # def cts_flood(self):
     #     while True:
-    #         print("hui")
+    #         print("ABCD")
     #         time.sleep(1)
 
-    # target_addr = '05:12:54:15:54:11', my_addr = '07:12:54:15:54:11'
     def rts_flood(self, BSSID, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
         self.screen = Drawer.drawer()
 
