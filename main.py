@@ -7,7 +7,8 @@ import Attacker, Sniffer, Drawer
 
 import signal
 import sys, os
-from rich.pretty import pprint
+import argparse
+from sys import platform
 
 
 
@@ -94,19 +95,32 @@ def signal_handler(signum, frame):
 
 
 if __name__ == "__main__":
-    # if not 'SUDO_UID' in os.environ.keys():
-    #     print("this program requires super user priv.")
-    #     sys.exit(1)
+    if "win" not in platform:
+        if not 'SUDO_UID' in os.environ.keys():
+            print("this program requires super user priv.")
+            sys.exit(1)
 
-    if len(sys.argv) < 3:  # TODO переделать под argparse!!!!!!!!!!!
-        print('''Call this prog with 2 args:\n '''
-              ''' 1) attacking wireless interface\n'''
-               '''2) control wireless interface\n'''
-              ''' ex. "python3 tester.py wlan0 wlan1mon"''')
+    parser = argparse.ArgumentParser(description='802.11 attack tester',
+                                     epilog='''Both attack and control interfaces should be able to be switched to monitor mode!!!
+                                     ex. $python3 main.py wlan0 wlan1mon''')
+    parser.add_argument('attack_interface', type=str, help='Attacking interface')
+    parser.add_argument('control_interface', type=str, help='Quality analyzing (sniffing) interface')
+
+    args = parser.parse_args()
+
+    # if len(sys.argv) < 3:
+    if args.attack_interface == "" or args.control_interface == "":
+        parser.print_help()
+        # print('''Call this prog with 2 args:\n '''
+        #       ''' 1) attacking wireless interface\n'''
+        #        '''2) control wireless interface\n'''
+        #       ''' ex. "python3 tester.py wlan0 wlan1mon"''')
         exit(0)
     else:
-        attack_int =  sys.argv[1]
-        control_int = sys.argv[2]
+        attack_int = args.attack_interface
+        control_int = args.control_interface
+        # attack_int =  sys.argv[1]
+        # control_int = sys.argv[2]
         print(attack_int, control_int)
 
     signal.signal(signal.SIGINT, signal_handler)
