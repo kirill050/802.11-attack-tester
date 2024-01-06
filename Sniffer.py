@@ -26,12 +26,30 @@ class sniffer:
         sniffer_main.sniffer_start_AP_analyzer(self.control_int, bssid_real=str(args["BSSID"]).lower(), bssid_fake=bssid_fake,
                                                channel=int(args["Channel"]))
 
-    def rts_flood(self, args: dict):# SSID, target_addr, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
+    def rts_flood(self, args: dict):
         if "attacking_addr" in args.keys():
             attacking_addr = args["attacking_addr"]
         else:
             attacking_addr = '05:12:54:15:54:11'
         sniffer_main.sniffer_start_RTS_analyzer(self.control_int, attacking_addr, str(args["BSSID"]).lower(), int(args["Channel"]))
+
+    def null_probe_response(self, args: list[dict]):
+        targets = []
+        channels = []
+        for device in args:
+            targets.append(device["MAC"])
+            if int(device["Channel"]) not in channels:
+                channels.append(int(device["Channel"]))
+        sniffer_main.sniffer_start_NPR_Analyzer(self.control_int, targets, channels)
+
+    def deauth(self, args: list[dict]):
+        targets = []
+        channels = []
+        for device in args:
+            targets.append(device["MAC"])
+            if int(device["Channel"]) not in channels:
+                channels.append(int(device["Channel"]))
+        sniffer_main.sniffer_start_Deauth_Analyzer(self.control_int, targets, channels)
 
 
 

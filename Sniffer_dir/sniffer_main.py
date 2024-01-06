@@ -70,3 +70,41 @@ def sniffer_start_AP_analyzer(interface, bssid_real, bssid_fake, channel: int = 
 	printer_thread = threading.Thread(target=a.Printer, args=(bssid_real,), daemon=True).start()
 	sniffer.exec(prn=MonitorCts, timeout=100)
 	print("Started network scanning")
+
+def changing_channels(sniffer: Sniffer, channels: list[int]):
+	while True:
+		for channel in channels:
+			sniffer.SetChannel(channel)
+			time.sleep(1.2)
+
+def sniffer_start_NPR_Analyzer(interface, targets, channels: list[int]):
+	sniffer = Sniffer(interface)
+
+	if not sniffer.IsMonitor():
+		if sniffer.EnableMonitor() is None:
+			print("ERROR enabling monitor mode!!!")
+			return
+	sniffer.SetInterface(interface)
+
+	changing_channels_thread = threading.Thread(target=changing_channels, args=(sniffer, channels, ), daemon=True).start()
+	a = NPR_Analyzer(targets=targets)
+	collector_thread = threading.Thread(target=a.Analyzer, args=(packets_q, ), daemon=True).start()
+	printer_thread = threading.Thread(target=a.Printer, args=(targets,), daemon=True).start()
+	sniffer.exec(prn=MonitorCts, timeout=100)
+	print("Started network scanning")
+
+def sniffer_start_Deauth_Analyzer(interface, targets, channels: list[int]):
+	sniffer = Sniffer(interface)
+
+	if not sniffer.IsMonitor():
+		if sniffer.EnableMonitor() is None:
+			print("ERROR enabling monitor mode!!!")
+			return
+	sniffer.SetInterface(interface)
+
+	changing_channels_thread = threading.Thread(target=changing_channels, args=(sniffer, channels, ), daemon=True).start()
+	a = Deauth_Analyzer(targets=targets)
+	collector_thread = threading.Thread(target=a.Analyzer, args=(packets_q, ), daemon=True).start()
+	printer_thread = threading.Thread(target=a.Printer, args=(targets,), daemon=True).start()
+	sniffer.exec(prn=MonitorCts, timeout=100)
+	print("Started network scanning")
