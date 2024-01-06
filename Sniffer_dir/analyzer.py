@@ -48,3 +48,53 @@ class RTS_Analyzer:
 			self.mutex.release()
 			sleep(self.timeout)
 
+
+
+class AP_Analyzer:
+
+	bssid_real = "ff:ff:ff:ff:ff:ff"
+	bssid_fake = "ff:ff:ff:ff:ff:ff"
+	mutex = threading.Lock()
+	true_packets = 0
+	our_packets = 0
+	packets = 1
+	timeout = 4
+
+	def __init__(self, **kwargs):
+		for i in kwargs.keys():
+			if getattr(self, i, None) is not None:
+				setattr(self, i, kwargs[i])
+
+	def Analyzer(self, q:queue.Queue, *args):
+		while True:
+			packet = q.get()
+			if packet.haslayer("Dot11FCS"):
+				adr1 = packet["Dot11FCS"].addr1
+				adr2 = packet["Dot11FCS"].addr2
+				adr3 = packet["Dot11FCS"].addr3
+				adr4 = packet["Dot11FCS"].addr4
+				self.mutex.acquire()
+				if self.bssid_fake in [adr1, adr2, adr3, adr4]:
+					self.our_packets += 1
+					self.packets += 1
+				if self.bssid_real in [adr1, adr2, adr3, adr4]:
+					self.true_packets += 1
+					self.packets += 1
+				self.mutex.release()
+
+	def Printer(self, BSSID):
+		screen = Drawer.drawer()
+		while True:
+			self.mutex.acquire()
+			screen.clean()
+			screen.print_label()
+			screen.print_text(f"Attacking {BSSID} by Rogue Twin Attack (type 'q' to stop)")
+			names = ["Frames real AP", "Frames fake AP"]
+			values = [self.true_packets/self.packets, self.our_packets/self.packets]
+			plt.simple_bar(names, values, width=100, title='Attack efficiency')
+			plt.show()
+			self.mutex.release()
+			sleep(self.timeout)
+
+
+

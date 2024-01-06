@@ -5,7 +5,7 @@ class WIFIScanner:
 	networks = {}
 	devices = []
 
-	def __init__(self, sniffer:Sniffer):
+	def __init__(self, sniffer: Sniffer):
 		self.sniffer = sniffer
 
 	def __init__(self, sniffer:Sniffer, target_BSSID: str):
@@ -20,7 +20,7 @@ class WIFIScanner:
 				self.networks[str(channel)+str(SSID)+str(BSSID)] = {
 					"SSID": str(SSID),
 					"channel": str(channel),
-					"BSSID" : str(BSSID)
+					"BSSID": str(BSSID)
 				}
 	def ScannerDevicesfunc(self, pkt):
 		if pkt.haslayer("Dot11FCS"):

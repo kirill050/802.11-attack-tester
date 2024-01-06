@@ -2,13 +2,12 @@ from scapy.all import *
 import os
 import sys
 from datetime import datetime
-from Sniffer_dir.common import *
-from Sniffer_dir.constants import *
 from pathlib import Path
 import datetime
 import threading
 import queue
-
+from Sniffer_dir.iface import *
+from Sniffer_dir.common import *
 
 
 			
@@ -18,16 +17,15 @@ class Sniffer:
 		self.packets = 0
 
 	def IsMonitor(self):
-		if "mon" in self.interface:  #TODO А если интерфейс не меняет название при переводе в режим монитора?!!!
+		if int(getMode(self.interface)) == 0:
 			return True
-		else:
-			return False
+		return False
+
 
 	def EnableMonitor(self): # возвращает имя интерфейса после его перевода в режим монитора 
 		bash(f"airmon-ng check kill")
 		bash(f"airmon-ng start {self.interface}")
 		for i in self.GetInterfaces():
-			# if "mon" in i and self.interface in i:
 			if self.interface in i:
 				self.interface = i
 				return i
