@@ -5,6 +5,14 @@ from Sniffer_dir.scanner import *
 
 packets_q = queue.Queue()
 
+def ScanNetwork_for_Devices(sniffer: Sniffer, BSSID: str, channel: int):
+	wifiscaner = WIFIScanner(sniffer, BSSID)
+
+	wifiscaner.sniffer.SetChannel(channel)
+	wifiscaner.scan_devices(timeout=10)
+
+	devices = wifiscaner.GetDevicesInfo()
+	return devices
 
 def ScanNetworks(sniffer: Sniffer, channels: list[int]):
 	wifiscaner = WIFIScanner(sniffer)

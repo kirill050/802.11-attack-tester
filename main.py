@@ -34,16 +34,32 @@ class UI:
     def null_probe_response(self):
         self.screen.clean()
 
-        Freq = self.__ask_Freq()
+        Freq = self.__ask_Freq('''Null Probe Response Attack\n''')
 
-        self.devices = self.sniffer.scan_devices_(Freq)  # need all devices here (кроме точек доступа)
+
+        self.nets = self.sniffer.scan_nets_(Freq)
 
         self.screen.clean()
 
-        self.screen.draw_table(["No.", "MAC", "Freq", "Channel"], self.devices,
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Null Probe Response Attack\n'''
+                                                                                                    '''Choose net to be attacked''')
+        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination):")
+        print(target_nets)
+
+        target_info = []
+        print("target_BSSIDs:")
+        for i in target_nets:
+            target_info.append([self.nets[i][2], self.nets[i][4], self.nets[i][1]])
+            print([self.nets[i][2], self.nets[i][4]])
+
+        self.devices = self.sniffer.scan_devices_(Freq, target_info)
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "MAC", "Freq", "Channel", "Net SSID", "Net BSSID"], self.devices,
                                '''Null Probe Response Attack\n'''
                                '''Choose device to be attacked''')
-        target_device = self.screen.get_input("Choose device to be attacked (type its number):")
+        target_device = self.screen.get_input("Choose device to be attacked (print digit or combination):")
         print(target_device)
 
         self.run_attack("null_probe_response", target_device)
@@ -54,7 +70,7 @@ class UI:
     def rts_flood(self):
         self.screen.clean()
 
-        Freq = self.__ask_Freq()
+        Freq = self.__ask_Freq('''RTS Flood Attack\n''')
 
         self.nets = self.sniffer.scan_nets_(Freq)
 
@@ -91,15 +107,14 @@ class UI:
                 sniff_proc.terminate()
                 break
 
-    def __ask_Freq(self):
+    def __ask_Freq(self, attack_name):
         self.screen.clean()
 
         self.frequencies = [["0", "2.4 GHz"]]
         self.frequencies.append(["1", "5 GHz"])
         self.frequencies.append(["2", "6 GHz"])
 
-        self.screen.draw_table(["No.", "F"], self.frequencies, '''RTS Flood Attack\n'''
-                                                              '''Frequency''')
+        self.screen.draw_table(["No.", "F"], self.frequencies, attack_name+'''Frequency''')
         Freq = self.screen.get_input("Witch frequency you`d like to attack? (print digit or combination)", str)
         print(Freq)
         return Freq

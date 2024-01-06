@@ -4,7 +4,7 @@ import multiprocessing
 import Drawer
 from Sniffer_dir import sniffer_main
 # from Sniffer import sniffer
-from Sniffer_dir.sniffer_main import ScanNetworks
+from Sniffer_dir.sniffer_main import ScanNetworks, ScanNetwork_for_Devices
 from rich.progress import Progress
 
 
@@ -74,8 +74,8 @@ class sniffer:
                     nets.append(["Ole4ka_6G", "E3:55:EF:16:C5:3E", "6", "10", "ax"])
         return nets
 
-    def __PHY_scan_devices(self, freq): #TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        nets = []
+    def __PHY_scan_devices(self, freq, target_info):
+        devices = []
 
         sniffer = sniffer_main.Sniffer()
         sniffer.SetInterface(self.control_int)
@@ -83,52 +83,49 @@ class sniffer:
         screen = Drawer.drawer()
 
         with Progress() as progress:
-            err = False  # TODO for tests
             if freq == "0":  # 2.4 GHz
-                screen.print_text("Scanning 2.4 GHz...", "red")
-                task = progress.add_task("[red]Scanning 2.4 GHz...", total=13)
-                for i in range(1, 14):
-                    progress.update(task, description=f"[red]Trying channel {i}")
+                screen.print_text("Scanning for devices on 2.4 GHz...", "red")
+                task = progress.add_task("[red]Scanning for devices on 2.4 GHz...",
+                                         total=len(target_info))
+                for i in len(target_info):
+                    progress.update(task, description=f"[red]Scanning {target_info[i][2]}:{target_info[i][0]} on channel {target_info[i][1]}...")
                     try:
-                        scan_results = ScanNetworks(sniffer, [i])
-                        for ii in scan_results.values():
-                            if [ii["SSID"], ii["BSSID"], "2.4", ii["channel"], "n"] not in nets:
-                                nets.append([ii["SSID"], ii["BSSID"], "2.4", ii["channel"], "n"])
+                        scan_results = ScanNetwork_for_Devices(sniffer, BSSID=target_info[i][0], channel=target_info[i][1])
+                        for iii in scan_results:
+                            if [iii, "2.4", target_info[i][1], target_info[i][2], target_info[i][0]] not in devices:
+                                devices.append([iii, "2.4", target_info[i][1], target_info[i][2], target_info[i][0]])
                     except Exception as e:
-                        print(f"Error {e} while scanning chanel {i} on 2.4GHz")
-                        err = True
+                        print(f"Error {e} while scanning {target_info[i][2]}:{target_info[i][0]} on channel {target_info[i][1]} on 2.4GHz")
                     progress.update(task, advance=1)
-                if err:
-                    nets.append(["Asus_Home_2G", "D2:73:3A:A9:1A:6C", "2.4", "5", "g"])
-                    nets.append(["GPON_Home_2G", "D2:9A:D0:0B:66:21", "2.4", "7", "ac"])
-                    nets.append(["Ole4ka_2G", "E3:55:EF:16:C5:3C", "2.4", "11", "ac"])
+
+
             if freq == "1":  # 5 GHz
                 task = progress.add_task("[green]Scanning 5 GHz...", 152) # TODO count channels
                 for i in range(152):
                     try:
-                        nets.append(ScanNetworks(sniffer, [i]).values())
+                        devices.append(ScanNetworks(sniffer, [i]).values())
                     except Exception as e:
                         print(f"Error {e} while scanning chanel {i} on 5 GHz")
                         err = True
                     self.screen.update_progress(task, 1)
                     time.sleep(0.05)
                 if err:
-                    nets.append(["GPON_Home_5G", "D2:9A:D0:0B:66:22", "5", "48", "ac"])
-                    nets.append(["Ole4ka_5G", "E3:55:EF:16:C5:3D", "5", "111", "ac"])
+                    devices.append(["GPON_Home_5G", "D2:9A:D0:0B:66:22", "5", "48", "ac"])
+                    devices.append(["Ole4ka_5G", "E3:55:EF:16:C5:3D", "5", "111", "ac"])
             if freq == "2":  # 6 GHz
                 task = progress.add_task("[blue]Scanning 6 GHz...", 200) # TODO count channels
                 for i in range(200):
                     try:
-                        nets.append(ScanNetworks(sniffer, [i]).values())
+                        devices.append(ScanNetworks(sniffer, [i]).values())
                     except Exception as e:
                         print(f"Error {e} while scanning chanel {i} on 6 GHz")
                         err = True
                     self.screen.update_progress(task, 1)
                     time.sleep(0.03)
                 if err:
-                    nets.append(["GPON_Home_6G", "D2:9A:D0:0B:66:23", "6", "129", "ax"])
-                    nets.append(["Ole4ka_6G", "E3:55:EF:16:C5:3E", "6", "10", "ax"])
-        return nets
+                    devices.append(["GPON_Home_6G", "D2:9A:D0:0B:66:23", "6", "129", "ax"])
+                    devices.append(["Ole4ka_6G", "E3:55:EF:16:C5:3E", "6", "10", "ax"])
+        return devices
 
     def scan_nets_(self, freq):
         nets = []
@@ -145,18 +142,18 @@ class sniffer:
             for net in subnets:
                 nets.append([str(len(nets)), *net])
         return nets
-    def scan_devices_(self, freq):
+    def scan_devices_(self, freq, target_info):
         devices = []
         if "0" in freq:  # 2.4 GHz
-            subdevices = self.__PHY_scan_devices("0")
+            subdevices = self.__PHY_scan_devices("0", target_info)
             for net in subdevices:
                 devices.append([str(len(devices)), *net])
         if "1" in freq:  # 5 GHz
-            subdevices = self.__PHY_scan_devices("1")
+            subdevices = self.__PHY_scan_devices("1", target_info)
             for net in subdevices:
                 devices.append([str(len(devices)), *net])
         if "2" in freq:  # 6 GHz
-            subdevices = self.__PHY_scan_devices("2")
+            subdevices = self.__PHY_scan_devices("2", target_info)
             for net in subdevices:
                 devices.append([str(len(devices)), *net])
         return devices
