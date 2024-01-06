@@ -5,8 +5,9 @@ class AP:
 	dnsmasq_config="dnsmasq.conf"
 	hostapd_config = "hostapd.conf"
 	ssid = "MagicianSkull"
-	channel="1"
-	password="1234567890"
+	channel = "1"
+	password = "1234567890"
+	wpa = 0
 
 	def __init__(self, wirelessiface: str, gatewayiface: str = "", ip: str = "192.168.5.1", **kwargs):
 		self.wirelessiface = wirelessiface
@@ -19,6 +20,7 @@ class AP:
 	def StopAp(self):
 		os.system("pkill -9 -f dnsmasq")
 		os.system("pkill -9 -f hostapd")
+		os.system(f"ifconfig {self.wirelessiface} down")
 
 	def EnableInterface(self):
 		os.system(f"ifconfig {self.wirelessiface} down")
@@ -58,10 +60,11 @@ class AP:
 			fp.write(f"deny_mac_file=/etc/hostapd.deny\n")
 			fp.write(f"wmm_enabled=0\n")  
 			fp.write(f"auth_algs=1\n") 
-			fp.write(f"wpa=2\n")
-			fp.write(f"wpa_key_mgmt=WPA-PSK\n")  
-			fp.write(f"rsn_pairwise=CCMP\n")
-			fp.write(f"wpa_passphrase={self.password}\n")
+			fp.write(f"wpa={self.wpa}\n")
+			if self.wpa != 0:
+				fp.write(f"wpa_key_mgmt=WPA-PSK\n")
+				fp.write(f"rsn_pairwise=CCMP\n")
+				fp.write(f"wpa_passphrase={self.password}\n")
 
 	def GetRange(self):
 		startadr = self.ip.split('.')

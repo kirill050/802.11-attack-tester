@@ -64,7 +64,7 @@ class AP_Analyzer:
 			if getattr(self, i, None) is not None:
 				setattr(self, i, kwargs[i])
 
-	def Analyzer(self,q:queue.Queue,*args):
+	def Analyzer(self, q:queue.Queue, *args):
 		while True:
 			packet = q.get()
 			if packet.haslayer("Dot11FCS"):
@@ -73,9 +73,9 @@ class AP_Analyzer:
 				adr3 = packet["Dot11FCS"].addr3
 				adr4 = packet["Dot11FCS"].addr4
 				self.mutex.acquire()
-				if self.bssid_fake in [adr1,adr2,adr3,adr4]:
+				if self.bssid_fake in [adr1, adr2, adr3, adr4]:
 					self.our_packets += 1
-				if self.bssid_real in [adr1,adr2,adr3,adr4]:
+				if self.bssid_real in [adr1, adr2, adr3, adr4]:
 					self.true_packets += 1
 				self.mutex.release()
 

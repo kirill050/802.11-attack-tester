@@ -4,7 +4,7 @@ class WIFIScanner:
 	
 	networks = {}
 
-	def __init__(self, sniffer:Sniffer):
+	def __init__(self, sniffer: Sniffer):
 		self.sniffer = sniffer
 
 	def Scannerfunc(self, pkt):
