@@ -2,3 +2,4 @@ keyboard~=0.13.5
 rich~=13.7.0
 scapy~=2.5.0
 plotext~=5.2.8
+psutil~=5.9.7

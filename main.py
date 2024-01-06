@@ -9,6 +9,7 @@ import signal
 import sys, os
 import argparse
 from sys import platform
+import psutil
 
 
 
@@ -103,8 +104,11 @@ class UI:
         while True:
             if keyboard.is_pressed("q"):
                 print("You pressed 'q'.")
-                attack_proc.terminate()
-                sniff_proc.terminate()
+                for i in [attack_proc, sniff_proc]:
+                    parent = psutil.Process(i.pid)
+                    for ii in parent.children(recursive=True):
+                        ii.send_signal(signal.SIGTERM)
+                    i.terminate()
                 break
 
     def __ask_Freq(self):
