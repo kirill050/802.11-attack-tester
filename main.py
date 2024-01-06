@@ -1,4 +1,5 @@
 import random
+import threading
 
 import keyboard
 import multiprocessing
@@ -20,7 +21,7 @@ class UI:
         self.control_int = control_int
         self.attacks = [self.rts_flood, self.null_probe_response, self.rogue_twin]
         self.attacker = Attacker.attacker(self.attack_int)
-        self.sniffer = Sniffer.sniffer(self.control_int)
+        self.sniffer = Sniffer.sniffer(self.control_int, self.attack_int)
 
     def main_window(self):
         raws = [["0", "RTS flood",
@@ -59,12 +60,18 @@ class UI:
         self.screen.clean()
 
         self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets,
-                               '''RTS Flood Attack\n'''
+                               '''Rogue Twin Attack\n'''
                                '''Choose net to be attacked''')
         target_net = self.screen.get_input("Choose net to be attacked (type its number):")
         print(target_net)
 
-        self.run_attack("rogue_twin", target_net)
+        args = {"SSID":    self.nets[target_net][1],
+                "BSSID":   self.nets[target_net][2],
+                "Freq":    self.nets[target_net][3],
+                "Channel": self.nets[target_net][4]
+                }
+
+        self.run_attack("rogue_twin", args["SSID"], args)
 
     def rts_flood(self):
         self.screen.clean()
@@ -80,24 +87,25 @@ class UI:
         target_net = self.screen.get_input("Choose net to be attacked (type its number):")
         print(target_net)
 
-        self.run_attack("rts_flood", target_net)  # attack must be equal
+        args = {"SSID":    self.nets[target_net][1],
+                "BSSID":   self.nets[target_net][2],
+                "Freq":    self.nets[target_net][3],
+                "Channel": self.nets[target_net][4]
+                }
+
+        self.run_attack("rts_flood", args["SSID"], args)  # attack must be equal
                                                   # to methods names in attacker and snifer classes!!!
 
-    def run_attack(self, attack, target_net):
+    def run_attack(self, attack, target, args):
         self.screen.clean()
         self.screen.print_label()
-        self.screen.print_text(f"Attacking {self.nets[target_net][2]} by {attack} (type 'q' to stop)")
+        self.screen.print_text(f"Attacking {target} by {attack} (type 'q' to stop)")
 
-        attack_proc = multiprocessing.Process(target=getattr(self.attacker, attack), args=(self.nets[target_net][1],
-                                                                                           self.nets[target_net][2],
-                                                                                           self.nets[target_net][3],
-                                                                                           self.nets[target_net][4]))
-        sniff_proc = multiprocessing.Process(target=getattr(self.sniffer, attack), args=(self.nets[target_net][1],
-                                                                                         self.nets[target_net][2],
-                                                                                         self.nets[target_net][3],
-                                                                                         self.nets[target_net][4]))
+        attack_proc = multiprocessing.Process(target=getattr(self.attacker, attack), args=(args, ))
+        sniff_proc = multiprocessing.Process(target=getattr(self.sniffer, attack), args=(args,))
+
         sniff_proc.start()
-        time.sleep(5)
+        time.sleep(3)
         attack_proc.start()
 
 

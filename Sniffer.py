@@ -6,25 +6,44 @@ from Sniffer_dir import sniffer_main
 # from Sniffer import sniffer
 from Sniffer_dir.sniffer_main import ScanNetworks
 from rich.progress import Progress
-
+from Sniffer_dir.common import bash
 
 class sniffer:
-    def __init__(self, control_int):
+    def __init__(self, control_int, attack_int = ""):
         self.control_int = control_int
+        self.attack_int = attack_int
+
 
     def __del__(self):
         self.screen = ""
 
-    def rogue_twin(self, SSID, BSSID, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
-        sniffer_main.sniffer_start(self.control_int, attacking_addr, BSSID, Channel)
-    def rts_flood(self, SSID, target_addr, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
-        sniffer_main.sniffer_start(self.control_int, attacking_addr, target_addr, Channel)
+    def rogue_twin (self, args: dict):
+        bssid_fake = bash(f"ifconfig {self.attack_int}"+" | grep ether | gawk '{print $2}'")
+        sniffer_main.sniffer_start_AP_analyzer(self.control_int, bssid_real=args["BSSID"], bssid_fake=bssid_fake,
+                                               channel=int(args["Channel"]))
+
+    def rts_flood(self, args: dict):# SSID, target_addr, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
+        if "attacking_addr" in args.keys():
+            attacking_addr = args["attacking_addr"]
+        else:
+            attacking_addr = '05:12:54:15:54:11'
+        sniffer_main.sniffer_start_RTS_analyzer(self.control_int, attacking_addr, args["BSSID"], int(args["Channel"]))
+
+
 
     def __PHY_scan(self, freq):
         nets = []
 
+        from sys import platform
+        if "win" not in platform:
+            nets.append(["Asus_Home_2G", "D2:73:3A:A9:1A:6C", "2.4", "5", "g"])
+            nets.append(["GPON_Home_2G", "D2:9A:D0:0B:66:21", "2.4", "7", "ac"])
+            nets.append(["Ole4ka_2G", "E3:55:EF:16:C5:3C", "2.4", "11", "ac"])
+            return nets
+
         sniffer = sniffer_main.Sniffer()
         sniffer.SetInterface(self.control_int)
+        sniffer.EnableMonitor()
 
         screen = Drawer.drawer()
 

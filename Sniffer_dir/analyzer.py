@@ -55,8 +55,9 @@ class AP_Analyzer:
 	bssid_real = "ff:ff:ff:ff:ff:ff"
 	bssid_fake = "ff:ff:ff:ff:ff:ff"
 	mutex = threading.Lock()
-	true_packets = 1
-	our_packets = 1
+	true_packets = 0
+	our_packets = 0
+	packets = 1
 	timeout = 4
 
 	def __init__(self, **kwargs):
@@ -75,8 +76,10 @@ class AP_Analyzer:
 				self.mutex.acquire()
 				if self.bssid_fake in [adr1, adr2, adr3, adr4]:
 					self.our_packets += 1
+					self.packets += 1
 				if self.bssid_real in [adr1, adr2, adr3, adr4]:
 					self.true_packets += 1
+					self.packets += 1
 				self.mutex.release()
 
 	def Printer(self, BSSID):
@@ -85,9 +88,9 @@ class AP_Analyzer:
 			self.mutex.acquire()
 			screen.clean()
 			screen.print_label()
-			screen.print_text(f"Attacking {BSSID} by RogueTwin Attack (type 'q' to stop)")
+			screen.print_text(f"Attacking {BSSID} by Rogue Twin Attack (type 'q' to stop)")
 			names = ["Frames real AP", "Frames fake AP"]
-			values = [self.true_packets,self.our_packets]
+			values = [self.true_packets/self.packets, self.our_packets/self.packets]
 			plt.simple_bar(names, values, width=100, title='Attack efficiency')
 			plt.show()
 			self.mutex.release()
