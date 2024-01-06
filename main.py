@@ -69,7 +69,7 @@ class UI:
     def rogue_twin(self):
         self.screen.clean()
 
-        Freq = self.__ask_Freq()
+        Freq = self.__ask_Freq('''Rogue Twin Attack\n''')
 
         self.nets = self.sniffer.scan_nets_(Freq)
 
@@ -136,6 +136,7 @@ class UI:
                 break
 
     def __ask_Freq(self, attack_name):
+        self.sniffer.start_monitor_mode()
         self.screen.clean()
 
         self.frequencies = [["0", "2.4 GHz"]]

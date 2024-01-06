@@ -72,7 +72,7 @@ class attacker:
         if args["Freq"] == '2.4':  # 2.4 GHz
             self.__change_channel(self.attack_int, int(args["Channel"])) #TODO Сделать различие от диапазона частот
 
-            ap = FakeAP.AP(wirelessiface=self.attack_int, channel=int(args["Channel"]))
+            ap = FakeAP.AP(wirelessiface=self.attack_int, channel=int(args["Channel"]), ssid=args["SSID"])
             ap.launch()
 
 
