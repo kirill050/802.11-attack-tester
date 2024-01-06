@@ -10,6 +10,8 @@ from Sniffer_dir.common import bash
 from sys import platform
 if "win" in platform:
     import netifaces
+from Sniffer_dir.iface import *
+from Sniffer_dir.common import *
 
 class sniffer:
     def __init__(self, control_int, attack_int = ""):
@@ -26,12 +28,30 @@ class sniffer:
         sniffer_main.sniffer_start_AP_analyzer(self.control_int, bssid_real=str(args["BSSID"]).lower(), bssid_fake=bssid_fake,
                                                channel=int(args["Channel"]))
 
-    def rts_flood(self, args: dict):# SSID, target_addr, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
+    def rts_flood(self, args: dict):
         if "attacking_addr" in args.keys():
             attacking_addr = args["attacking_addr"]
         else:
             attacking_addr = '05:12:54:15:54:11'
         sniffer_main.sniffer_start_RTS_analyzer(self.control_int, attacking_addr, str(args["BSSID"]).lower(), int(args["Channel"]))
+
+    def null_probe_response(self, args: list[dict]):
+        targets = []
+        channels = []
+        for device in args:
+            targets.append(device["MAC"])
+            if int(device["Channel"]) not in channels:
+                channels.append(int(device["Channel"]))
+        sniffer_main.sniffer_start_NPR_Analyzer(self.control_int, targets, channels)
+
+    def deauth(self, args: list[dict]):
+        targets = []
+        channels = []
+        for device in args:
+            targets.append(device["MAC"])
+            if int(device["Channel"]) not in channels:
+                channels.append(int(device["Channel"]))
+        sniffer_main.sniffer_start_Deauth_Analyzer(self.control_int, targets, channels)
 
 
 
@@ -183,15 +203,23 @@ class sniffer:
                 devices.append([str(len(devices)), *net])
         return devices
 
-    def start_monitor_mode(self):
-            bash(f"airmon-ng check kill")
-            bash(f"airmon-ng start {self.control_int}")
-            for i in self.GetInterfaces():
-                if self.control_int in i:
-                    self.control_int = i
-                    return i
+    def GetInterfaces(self):
+        retval = []
+        p = Path(INTERFACESPATH)
+        for i in os.listdir(INTERFACESPATH):
+            for iface in os.listdir(p / i / INTERFACESPATHAPPENDIX):
+                retval.append(iface)
+        return retval
 
-            return None
+    def start_monitor_mode(self):
+        bash(f"airmon-ng check kill")
+        bash(f"airmon-ng start {self.control_int}")
+        for i in self.GetInterfaces():
+            if self.control_int in i:
+                self.control_int = i
+                return i
+
+        return None
 
     def change_channel(self, interface):
         print(f"iwconfig {interface}...")

