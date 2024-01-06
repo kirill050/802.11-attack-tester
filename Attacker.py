@@ -27,15 +27,12 @@ class attacker:
     def __del__(self): # Destroy here all complex fields!!!
         self.screen = ""
 
-    # def __init__(self):
-    #     print("starting attacker")
-
     # def cts_flood(self):
     #     while True:
     #         print("ABCD")
     #         time.sleep(1)
 
-    def rts_flood(self, args: dict): #SSID, BSSID, Freq, Channel, attacking_addr='05:12:54:15:54:11'):
+    def rts_flood(self, args: dict):
         self.screen = Drawer.drawer()
 
         if "attacking_addr" in args.keys():
@@ -67,17 +64,16 @@ class attacker:
     def null_probe_response(self):
         print("null_probe_response")
 
-    def rogue_twin(self, args: dict):#SSID, BSSID, Freq, Channel):
+    def rogue_twin(self, args: dict):
         self.screen = Drawer.drawer()
 
-        # self.attack_int = self.__start_monitor_mode(self.attack_int)
         print(args.keys())
         print(args.values())
-        # if args["Freq"] == '2.4':  # 2.4 GHz
-            # self.__change_channel(self.attack_int, int(args["Channel"])) #TODO Сделать различие от диапазона частот
+        if args["Freq"] == '2.4':  # 2.4 GHz
+            self.__change_channel(self.attack_int, int(args["Channel"])) #TODO Сделать различие от диапазона частот
 
-            # ap = FakeAP.AP(wirelessiface=self.attack_int, channel=int(args["Channel"]))
-            # ap.launch()
+            ap = FakeAP.AP(wirelessiface=self.attack_int, channel=int(args["Channel"]))
+            ap.launch()
 
 
     def __GetInterfaces(self):

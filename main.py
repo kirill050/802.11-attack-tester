@@ -155,10 +155,6 @@ if __name__ == "__main__":
     # if len(sys.argv) < 3:
     if args.attack_interface == "" or args.control_interface == "":
         parser.print_help()
-        # print('''Call this prog with 2 args:\n '''
-        #       ''' 1) attacking wireless interface\n'''
-        #        '''2) control wireless interface\n'''
-        #       ''' ex. "python3 tester.py wlan0 wlan1mon"''')
         exit(0)
     else:
         attack_int = args.attack_interface

@@ -50,16 +50,11 @@ def sniffer_start_RTS_analyzer(interface, attacking_addr, target_addr, channel: 
 def sniffer_start_AP_analyzer(interface, bssid_real, bssid_fake, channel: int = 1):
 	sniffer = Sniffer(interface)
 
-	# ifaces = sniffer.GetInterfaces()
-	# sniffer.SetInterface(ifaces[0]) # просто берём первый из списка
-
 	if not sniffer.IsMonitor():
 		if sniffer.EnableMonitor() is None:
 			print("ERROR enabling monitor mode!!!")
 			return
 	sniffer.SetInterface(interface)
-
-	# ScanNetworks(sniffer, [3, 44, 11, 6])
 
 	sniffer.SetChannel(channel)
 	a = AP_Analyzer(bssid_real=bssid_real, bssid_fake=bssid_fake)
