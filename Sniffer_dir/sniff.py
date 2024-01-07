@@ -23,8 +23,8 @@ class Sniffer:
 
 
 	def EnableMonitor(self): # возвращает имя интерфейса после его перевода в режим монитора 
-		bash(f"airmon-ng check kill")
-		bash(f"airmon-ng start {self.interface}")
+		bash(f"airmon-ng check kill > /dev/null")
+		bash(f"airmon-ng start {self.interface} > /dev/null")
 		for i in self.GetInterfaces():
 			if self.interface in i:
 				self.interface = i

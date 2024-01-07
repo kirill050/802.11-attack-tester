@@ -4,14 +4,6 @@ from time import sleep
 import plotext as plt
 import Drawer
 
-'''
-y=[10, 39, 4095, 17, 106]
-plt.plot(y)
-plt.xlabel("logarithmic scale")
-plt.ylabel("linear scale")
-#plt.scatter(x,y)
-plt.show()
-'''
 class RTS_Analyzer:
 	packets = 1
 	rts_packets = 1 
@@ -124,27 +116,29 @@ class NPR_Analyzer:
 			packet = q.get()
 			self.mutex.acquire()
 			if packet.haslayer("Dot11FCS"):
-				if not (packet["Dot11FCS"].type == 0 and packet["Dot11FCS"].subtype == 0x5):
-					for target_addr in self.targets:
-						if packet["Dot11FCS"].addr1 == target_addr or packet["Dot11FCS"].addr2 == target_addr or \
-								packet["Dot11FCS"].addr3 == target_addr:
-							self.packets[self.targets.index(target_addr)][self.TCM_number] += 1
+				if not (packet["Dot11FCS"].type == 0 and packet["Dot11FCS"].subtype == 0x5):  # Probe response
+					if not (packet["Dot11FCS"].type == 0 and packet["Dot11FCS"].subtype == 12):  # Deauth
+						for target_addr in self.targets:
+							if packet["Dot11FCS"].addr1 == target_addr or packet["Dot11FCS"].addr2 == target_addr or \
+									packet["Dot11FCS"].addr3 == target_addr:
+								self.packets[self.targets.index(target_addr)][self.TCM_number] += 1
 			self.mutex.release()
 
 	def Printer(self, MACs):
 		screen = Drawer.drawer()
 		while True:
 			self.mutex.acquire()
+			plt.clear_data()
 			screen.clean()
 			screen.print_label()
-			screen.print_text(f"Attacking {MACs} by Null Probe Response Attack (type 'q' to stop)")
-			for i in len(self.targets):
+			for i in range(len(self.targets)):
 				plt.plot(self.packets[i], label=MACs[i])
-			plt.xlabel("TCM_number")
+			plt.xlabel("Number of the technological cycle of management number")
 			plt.ylabel("Number of packets by device")
+			plt.title(f"Attacking {MACs} by Null Probe Response Attack (type 'q' to stop)")
 			plt.show()
 
-			for i in len(self.targets):
+			for i in range(len(self.targets)):
 				self.packets[i].append(0)
 			self.TCM_number += 1
 
@@ -182,19 +176,20 @@ class Deauth_Analyzer:
 		screen = Drawer.drawer()
 		while True:
 			self.mutex.acquire()
+			plt.clear_data()
 			screen.clean()
 			screen.print_label()
-			screen.print_text(f"Attacking {MACs} by Null Probe Response Attack (type 'q' to stop)")
-			for i in len(self.targets):
+			screen.print_text(f"Attacking {MACs} by Deauthentication Attack (type 'q' to stop)")
+			for i in range(len(self.targets)):
 				plt.plot(self.packets[i], label=MACs[i])
-			plt.xlabel("TCM_number")
+			plt.xlabel("Number of the technological cycle of management")
 			plt.ylabel("Number of packets by device")
+			plt.title(f"Attacking {MACs} by Deauthentication Attack (type 'q' to stop)")
 			plt.show()
 
-			for i in len(self.targets):
+			for i in range(len(self.targets)):
 				self.packets[i].append(0)
 			self.TCM_number += 1
 
 			self.mutex.release()
 			sleep(self.timeout)
-

@@ -44,13 +44,13 @@ class drawer:
 
     def get_input(self, question, var_type=int):
         res = self.console.input(question)
+        if "q" in res:
+            exit(12)
         try:
             res = var_type(res)
             return res
         except:
-            if "q" in res:
-                return -1
-            print(f"You should enter value of type{var_type}!!!")
+            print(f"You should enter value of type{var_type}!!! (or q to exit)")
             return self.get_input(question, var_type)
 
     def clean(self):

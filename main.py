@@ -32,7 +32,9 @@ class UI:
         raws.append(["4", "Coming soon", "..."])
         self.screen.draw_table(["No.", "Name", "Brief descr."], raws)
 
-        self.attacks[self.screen.get_input("Witch attack you wanna run?", int)]()
+        attack = self.screen.get_input("Witch attack you wanna run? (type its number)", int)
+        if attack in range(len(self.attacks)):
+            self.attacks[attack]()
 
     def deauth(self):
         self.screen.clean()
@@ -46,33 +48,42 @@ class UI:
 
         self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Deauthentication Attack\n'''
                                                                                                     '''Choose net to be attacked''')
-        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination):")
-        print(target_nets)
+        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         target_info = []
-        print("target_BSSIDs:")
-        for i in target_nets:
+        for net in (target_nets.replace(" ", "")).split(','):
+            i = int(net)
             target_info.append([self.nets[i][2], self.nets[i][4], self.nets[i][1]])
-            print([self.nets[i][2], self.nets[i][4]])
 
         self.devices = self.sniffer.scan_devices_(Freq, target_info)
+        while len(self.devices[0]) == 0:
+            self.screen.print_label()
+            nets = []
+            for i in range(len((target_nets.replace(" ", "")).split(','))):
+                nets.append([self.nets[i][2], self.nets[i][4]])
+            self.screen.print_text(f"No devices found at nets {nets}!")
+            if "y" in (self.screen.get_input("Rescan them? (y/n)", str)).lower():
+                self.screen.clean()
+                self.devices = self.sniffer.scan_devices_(Freq, target_info)
+            else:
+                return
 
         self.screen.clean()
 
         self.screen.draw_table(["No.", "MAC", "Freq", "Channel", "Net SSID", "Net BSSID"], self.devices,
                                '''Deauthentication Attack\n'''
                                '''Choose device to be attacked''')
-        target_device = self.screen.get_input("Choose device to be attacked (print digit or combination):")
-        print(target_device)
+        target_devices = self.screen.get_input("Choose devices to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         args = []
         target = []
-        for i in target_nets:
+        for device in (target_devices.replace(" ", "")).split(','):
+            i = int(device)
             args.append({
-                "MAC": self.devices[i][1],
-                "BSSID": self.nets[i][4],
-                "Freq": self.nets[i][2],
-                "Channel": self.nets[i][3]
+                "MAC":     self.devices[i][1],
+                "BSSID":   self.devices[i][5],
+                "Freq":    self.devices[i][2],
+                "Channel": self.devices[i][3]
             })
             target.append(self.devices[i][1])
 
@@ -85,41 +96,57 @@ class UI:
 
 
         self.nets = self.sniffer.scan_nets_(Freq)
+        while len(self.nets[0]) == 0:
+            self.screen.print_label()
+            self.screen.print_text(f"No nets found at freq {Freq}!")
+            if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
+                self.screen.clean()
+                self.nets = self.sniffer.scan_nets_(Freq)
+            else:
+                return
 
         self.screen.clean()
 
         self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Null Probe Response Attack\n'''
                                                                                                     '''Choose net to be attacked''')
-        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination):")
-        print(target_nets)
+        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         target_info = []
-        print("target_BSSIDs:")
-        for i in target_nets:
+        for net in (target_nets.replace(" ", "")).split(','):
+            i = int(net)
             target_info.append([self.nets[i][2], self.nets[i][4], self.nets[i][1]])
-            print([self.nets[i][2], self.nets[i][4]])
 
         self.devices = self.sniffer.scan_devices_(Freq, target_info)
+        while len(self.devices[0]) == 0:
+            self.screen.print_label()
+            nets = []
+            for i in range(len((target_nets.replace(" ", "")).split(','))):
+                nets.append([self.nets[i][2], self.nets[i][4]])
+            self.screen.print_text(f"No devices found at nets {nets}!")
+            if "y" in (self.screen.get_input("Rescan them? (y/n)", str)).lower():
+                self.screen.clean()
+                self.devices = self.sniffer.scan_devices_(Freq, target_info)
+            else:
+                return
 
         self.screen.clean()
 
         self.screen.draw_table(["No.", "MAC", "Freq", "Channel", "Net SSID", "Net BSSID"], self.devices,
                                '''Null Probe Response Attack\n'''
                                '''Choose device to be attacked''')
-        target_device = self.screen.get_input("Choose device to be attacked (print digit or combination):")
-        print(target_device)
+        target_devices = self.screen.get_input("Choose devices to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         args = []
         target = []
-        for i in target_nets:
+        for device in (target_devices.replace(" ", "")).split(','):
+            i = int(device)
             args.append({
-                "MAC": self.devices[i][1],
-                "BSSID": self.nets[i][4],
-                "Freq": self.nets[i][2],
-                "Channel": self.nets[i][3]
+                "MAC":     self.devices[i][1],
+                "BSSID":   self.devices[i][5],
+                "Freq":    self.devices[i][2],
+                "Channel": self.devices[i][3]
             })
             target.append(self.devices[i][1])
-
         self.run_attack("null_probe_response", target, args)
 
     def rogue_twin(self):
@@ -129,13 +156,21 @@ class UI:
 
         self.nets = self.sniffer.scan_nets_(Freq)
 
+        while len(self.nets[0]) == 0:
+            self.screen.print_label()
+            self.screen.print_text(f"No nets found at freq {Freq}!")
+            if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
+                self.screen.clean()
+                self.nets = self.sniffer.scan_nets_(Freq)
+            else:
+                return
+
         self.screen.clean()
 
         self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets,
                                '''Rogue Twin Attack\n'''
                                '''Choose net to be attacked''')
         target_net = self.screen.get_input("Choose net to be attacked (type its number):")
-        print(target_net)
 
         args = {"SSID":    self.nets[target_net][1],
                 "BSSID":   self.nets[target_net][2],
@@ -152,12 +187,20 @@ class UI:
 
         self.nets = self.sniffer.scan_nets_(Freq)
 
+        while len(self.nets[0]) == 0:
+            self.screen.print_label()
+            self.screen.print_text(f"No nets found at freq {Freq}!")
+            if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
+                self.screen.clean()
+                self.nets = self.sniffer.scan_nets_(Freq)
+            else:
+                return
+
         self.screen.clean()
 
         self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''RTS Flood Attack\n'''
                                                                                                     '''Choose net to be attacked''')
         target_net = self.screen.get_input("Choose net to be attacked (type its number):")
-        print(target_net)
 
         args = {"SSID":    self.nets[target_net][1],
                 "BSSID":   self.nets[target_net][2],
@@ -195,13 +238,12 @@ class UI:
         self.sniffer.start_monitor_mode()
         self.screen.clean()
 
-        self.frequencies = [["0", "2.4 GHz"]]
-        self.frequencies.append(["1", "5 GHz"])
-        self.frequencies.append(["2", "6 GHz"])
+        self.frequencies = [["0", "2.4 GHz", "✅"]]
+        self.frequencies.append(["1", "5 GHz", "❌"])
+        self.frequencies.append(["2", "6 GHz", "❌"])
 
-        self.screen.draw_table(["No.", "F"], self.frequencies, attack_name+'''Frequency''')
+        self.screen.draw_table(["No.", "F", "Status"], self.frequencies, attack_name+'''Frequency''')
         Freq = self.screen.get_input("Witch frequency you`d like to attack? (print digit or combination)", str)
-        print(Freq)
         return Freq
 
 
