@@ -108,3 +108,36 @@ number of frames received/sent by attacking device per the technological cycle o
 ![Deauth_attack](imgs%2Fdeauth_attack.png)
 
 To stop the attack and return to the main window press `q` button.
+
+## Disassociation Attack
+
+After scanning of the chosen frequency range(s), 
+you should choose net(s) in which the search for devices to attack them will be performed. Ex:
+![Disass_nets](imgs%2Fdissas_nets.png)
+
+Then chosen nets will be scanned:
+![Disass_nets_scan](imgs%2Fdissas_nets_scan.png)
+
+To determine target devices for this attack write their numbers separated by commas. Ex:
+![Disass_devices](imgs%2Fdissas_devices.png)
+
+Then attack will be started with demonstration of it`s efficiency by plot showing
+number of frames received/sent by attacking device per the technological cycle of management (one clock cycle).
+![Disass_attack](imgs%2Fdissas_attack.png)
+
+To stop the attack and return to the main window press `q` button.
+
+## Omerta Attack
+
+After scanning of the chosen frequency range(s), 
+you should choose net(s) to be attacked. Ex:
+![Omerta_nets](imgs%2Fomerta_nets.png)
+
+Then chosen nets will be scanned:
+![Omerta_nets_scan](imgs%2Fomerta_nets_scan.png)
+
+Then attack will be started with demonstration of it`s efficiency by plot showing
+number of frames received/sent by attacking net per the technological cycle of management (one clock cycle).
+![Omerta_attack](imgs%2Fomerta_attack.png)
+
+To stop the attack and return to the main window press `q` button.

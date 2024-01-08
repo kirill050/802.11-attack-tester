@@ -185,7 +185,7 @@ class Deauth_Dissasoc_Analyzer:
 				plt.plot(self.packets[i], label=MACs[i])
 			plt.xlabel("Number of the technological cycle of management")
 			plt.ylabel("Number of packets by device")
-			plt.title(f"Attacking {MACs} by Deauthentication Attack (type 'q' to stop)")
+			plt.title(f"Attacking {MACs} by {attack_name} (type 'q' to stop)")
 			plt.show()
 
 			for i in range(len(self.targets)):
