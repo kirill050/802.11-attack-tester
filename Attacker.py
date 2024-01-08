@@ -146,7 +146,7 @@ class attacker:
                     quantity = 3
                     sendp(auth_packet, iface=self.attack_int, count=quantity, verbose=0)
 
-                    assoc_packet = Dot11(addr1=args[i]["BSSID"], addr2=client_mac, addr3=args[i]["BSSID"]) \
+                    assoc_packet = RadioTap() / Dot11(addr1=args[i]["BSSID"], addr2=client_mac, addr3=args[i]["BSSID"]) \
                              / Dot11AssoReq(cap=0x1100, listen_interval=0x00a) \
                              / Dot11Elt(ID=0, info="{}".format(args[i]["SSID"]))
                     quantity = 3

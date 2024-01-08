@@ -141,3 +141,15 @@ number of frames received/sent by attacking net per the technological cycle of m
 ![Omerta_attack](imgs%2Fomerta_attack.png)
 
 To stop the attack and return to the main window press `q` button.
+
+## AP association table overflow Attack
+
+After scanning of the chosen frequency range(s), 
+you should choose net(s) to be attacked. Ex:
+![AP_clients_flood_nets](imgs%2FAP_clients_flood_nets.png)
+
+Then attack will be started with demonstration of it`s efficiency by plot showing
+number of frames received/sent by attacking net per the technological cycle of management (one clock cycle).
+![AP_clients_flood_attack](imgs%2FAP_clients_flood_attack.png)
+
+To stop the attack and return to the main window press `q` button.
