@@ -145,13 +145,14 @@ class NPR_Analyzer:
 			self.mutex.release()
 			sleep(self.timeout)
 
-class Deauth_Analyzer:
+class Deauth_Dissasoc_Analyzer:
 
 	targets = ["ff:ff:ff:ff:ff:ff"]
 	mutex = threading.Lock()
 	packets = []
 	TCM_number = 0  # The technological cycle of management
 	timeout = 7
+	subtype = 12
 
 	def __init__(self, **kwargs):
 		for i in kwargs.keys():
@@ -165,21 +166,21 @@ class Deauth_Analyzer:
 			packet = q.get()
 			self.mutex.acquire()
 			if packet.haslayer("Dot11FCS"):
-				if not (packet["Dot11FCS"].type == 0 and packet["Dot11FCS"].subtype == 12):
+				if not (packet["Dot11FCS"].type == 0 and packet["Dot11FCS"].subtype == self.subtype):
 					for target_addr in self.targets:
 						if packet["Dot11FCS"].addr1 == target_addr or packet["Dot11FCS"].addr2 == target_addr or \
 								packet["Dot11FCS"].addr3 == target_addr:
 							self.packets[self.targets.index(target_addr)][self.TCM_number] += 1
 			self.mutex.release()
 
-	def Printer(self, MACs):
+	def Printer(self, MACs, attack_name):
 		screen = Drawer.drawer()
 		while True:
 			self.mutex.acquire()
 			plt.clear_data()
 			screen.clean()
 			screen.print_label()
-			screen.print_text(f"Attacking {MACs} by Deauthentication Attack (type 'q' to stop)")
+			screen.print_text(f"Attacking {MACs} by {attack_name} (type 'q' to stop)")
 			for i in range(len(self.targets)):
 				plt.plot(self.packets[i], label=MACs[i])
 			plt.xlabel("Number of the technological cycle of management")
