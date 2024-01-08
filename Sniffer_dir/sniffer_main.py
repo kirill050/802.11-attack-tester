@@ -108,3 +108,19 @@ def sniffer_start_Deauth_Dissasoc_Analyzer(interface, subtype, targets, channels
 	printer_thread = threading.Thread(target=a.Printer, args=(targets, attack_name, ), daemon=True).start()
 	sniffer.exec(prn=MonitorCts)#, timeout=100)
 	print("Started network scanning")
+
+def sniffer_start_AP_assoc_table_overflow_Analyzer(interface, targets, channels: list[int]):
+	sniffer = Sniffer(interface)
+
+	if not sniffer.IsMonitor():
+		if sniffer.EnableMonitor() is None:
+			print("ERROR enabling monitor mode!!!")
+			return
+	sniffer.SetInterface(interface)
+
+	changing_channels_thread = threading.Thread(target=changing_channels, args=(sniffer, channels, ), daemon=True).start()
+	a = AP_ass_table_overflow_Analyzer(targets=targets)
+	collector_thread = threading.Thread(target=a.Analyzer, args=(packets_q, ), daemon=True).start()
+	printer_thread = threading.Thread(target=a.Printer, args=(targets, ), daemon=True).start()
+	sniffer.exec(prn=MonitorCts)
+	print("Started network scanning")

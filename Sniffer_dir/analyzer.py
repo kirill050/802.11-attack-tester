@@ -194,3 +194,53 @@ class Deauth_Dissasoc_Analyzer:
 
 			self.mutex.release()
 			sleep(self.timeout)
+
+class AP_assoc_table_overflow_Analyzer:
+
+	targets = ["ff:ff:ff:ff:ff:ff"]
+	mutex = threading.Lock()
+	packets = []
+	TCM_number = 0  # The technological cycle of management
+	timeout = 7
+	subtype = 12
+
+	def __init__(self, **kwargs):
+		for i in kwargs.keys():
+			if getattr(self, i, None) is not None:
+				setattr(self, i, kwargs[i])
+		for i in self.targets:
+			self.packets.append([0])
+
+	def Analyzer(self, q: queue.Queue):
+		while True:
+			packet = q.get()
+			self.mutex.acquire()
+			if packet.haslayer("Dot11FCS"):
+				if not (packet["Dot11FCS"].type == 0 and ( packet["Dot11FCS"].subtype not in [0, 1, 10, 11, 12] ) ): # not Disassociation; Authentication; Deauthentication; Association request; Association response
+					for target_addr in self.targets:
+						if packet["Dot11FCS"].addr1 == target_addr or packet["Dot11FCS"].addr2 == target_addr or \
+								packet["Dot11FCS"].addr3 == target_addr:
+							self.packets[self.targets.index(target_addr)][self.TCM_number] += 1
+			self.mutex.release()
+
+	def Printer(self, MACs):
+		screen = Drawer.drawer()
+		while True:
+			self.mutex.acquire()
+			plt.clear_data()
+			screen.clean()
+			screen.print_label()
+			screen.print_text(f"Attacking {MACs} by AP association table overflow Attack (type 'q' to stop)")
+			for i in range(len(self.targets)):
+				plt.plot(self.packets[i], label=MACs[i])
+			plt.xlabel("Number of the technological cycle of management")
+			plt.ylabel("Number of packets by device")
+			plt.title(f"Attacking {MACs} by AP association table overflow Attack (type 'q' to stop)")
+			plt.show()
+
+			for i in range(len(self.targets)):
+				self.packets[i].append(0)
+			self.TCM_number += 1
+
+			self.mutex.release()
+			sleep(self.timeout)
