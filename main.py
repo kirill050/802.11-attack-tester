@@ -19,7 +19,8 @@ class UI:
         self.screen = Drawer.drawer()
         self.attack_int = attack_int
         self.control_int = control_int
-        self.attacks = [self.rts_flood, self.null_probe_response, self.rogue_twin, self.deauth]
+        self.attacks = [self.rts_flood, self.null_probe_response, self.rogue_twin, self.deauth, self.disassoc,
+                        self.Omerta_Attack]
         self.attacker = Attacker.attacker(self.attack_int)
         self.sniffer = Sniffer.sniffer(self.control_int, self.attack_int)
 
@@ -28,13 +29,125 @@ class UI:
                  "Floods RTS/CTS frames to reserve the RF medium and force other wireless devices sharing the RF medium to hold back their transmissions"]]
         raws.append(["1", "Null Probe Response", "Sending probe response containing a null SSID. Causes lock up upon receiving such a probe response"])
         raws.append(["2", "Rogue twin", "Creates fake AP with the same channel and SSID as target"])  # "✅" "❌"
-        raws.append(["3", "Deauthentication attack", "Attempts to disconnect specific stations in range"])
-        raws.append(["4", "Coming soon", "..."])
+        raws.append(["3", "Deauthentication attack", "Attempts to disconnect specific clients in range by sending deauth frames"])
+        raws.append(["4", "Disassociation attack", "Attempts to disconnect specific clients in range by sending disassociation frames"])
+        raws.append(["5", "Omerta Attack",
+                     "Attempts to disconnect clients by sending disassociation frames with a reason code of 0x01 (“unspecified”) to all stations in wireless net"])
+        raws.append(["6", "Coming soon", "..."])
         self.screen.draw_table(["No.", "Name", "Brief descr."], raws)
 
         attack = self.screen.get_input("Witch attack you wanna run? (type its number)", int)
         if attack in range(len(self.attacks)):
             self.attacks[attack]()
+
+    def Omerta_Attack(self):
+        self.screen.clean()
+
+        Freq = self.__ask_Freq('''Omerta Attack\n''')
+
+
+        self.nets = self.sniffer.scan_nets_(Freq)
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Omerta Attack\n'''
+                                                                                                    '''Choose net to be attacked''')
+        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination using commas \",\"):", var_type=str)
+
+        target_info = []
+        for net in (target_nets.replace(" ", "")).split(','):
+            i = int(net)
+            target_info.append([self.nets[i][2], self.nets[i][4], self.nets[i][1]])
+
+        self.devices = self.sniffer.scan_devices_(Freq, target_info)
+        while len(self.devices[0]) == 0:
+            self.screen.print_label()
+            nets = []
+            for i in range(len((target_nets.replace(" ", "")).split(','))):
+                nets.append([self.nets[i][2], self.nets[i][4]])
+            self.screen.print_text(f"No devices found at nets {nets}!")
+            if "y" in (self.screen.get_input("Rescan them? (y/n)", str)).lower():
+                self.screen.clean()
+                self.devices = self.sniffer.scan_devices_(Freq, target_info)
+            else:
+                return
+
+        self.screen.clean()
+
+        target_devices = ""
+        for i in range(len(self.devices)):
+            for ii in range(len(target_info)):
+                if self.devices[i][5] in target_info[ii]:
+                    if len(target_devices) > 0:
+                        target_devices += ','
+                    target_devices += str(self.devices[i][0])
+
+        args = []
+        target = []
+        for device in (target_devices.replace(" ", "")).split(','):
+            i = int(device)
+            args.append({
+                "MAC":     self.devices[i][1],
+                "BSSID":   self.devices[i][5],
+                "Freq":    self.devices[i][2],
+                "Channel": self.devices[i][3]
+            })
+            target.append([self.devices[i][4], self.devices[i][5]])
+
+        self.run_attack("omerta_attack", target, args)
+
+    def disassoc(self):
+        self.screen.clean()
+
+        Freq = self.__ask_Freq('''Disassociation Attack\n''')
+
+
+        self.nets = self.sniffer.scan_nets_(Freq)
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Disassociation Attack\n'''
+                                                                                                    '''Choose net to be attacked''')
+        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination using commas \",\"):", var_type=str)
+
+        target_info = []
+        for net in (target_nets.replace(" ", "")).split(','):
+            i = int(net)
+            target_info.append([self.nets[i][2], self.nets[i][4], self.nets[i][1]])
+
+        self.devices = self.sniffer.scan_devices_(Freq, target_info)
+        while len(self.devices[0]) == 0:
+            self.screen.print_label()
+            nets = []
+            for i in range(len((target_nets.replace(" ", "")).split(','))):
+                nets.append([self.nets[i][2], self.nets[i][4]])
+            self.screen.print_text(f"No devices found at nets {nets}!")
+            if "y" in (self.screen.get_input("Rescan them? (y/n)", str)).lower():
+                self.screen.clean()
+                self.devices = self.sniffer.scan_devices_(Freq, target_info)
+            else:
+                return
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "MAC", "Freq", "Channel", "Net SSID", "Net BSSID"], self.devices,
+                               '''Disassociation Attack\n'''
+                               '''Choose device to be attacked''')
+        target_devices = self.screen.get_input("Choose devices to be attacked (print digit or combination using commas \",\"):", var_type=str)
+
+        args = []
+        target = []
+        for device in (target_devices.replace(" ", "")).split(','):
+            i = int(device)
+            args.append({
+                "MAC":     self.devices[i][1],
+                "BSSID":   self.devices[i][5],
+                "Freq":    self.devices[i][2],
+                "Channel": self.devices[i][3]
+            })
+            target.append(self.devices[i][1])
+
+        self.run_attack("dissasoc", target, args)
 
     def deauth(self):
         self.screen.clean()
@@ -88,6 +201,37 @@ class UI:
             target.append(self.devices[i][1])
 
         self.run_attack("deauth", target, args)
+
+    def rogue_twin(self):
+        self.screen.clean()
+
+        Freq = self.__ask_Freq('''Rogue Twin Attack\n''')
+
+        self.nets = self.sniffer.scan_nets_(Freq)
+
+        while len(self.nets[0]) == 0:
+            self.screen.print_label()
+            self.screen.print_text(f"No nets found at freq {Freq}!")
+            if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
+                self.screen.clean()
+                self.nets = self.sniffer.scan_nets_(Freq)
+            else:
+                return
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets,
+                               '''Rogue Twin Attack\n'''
+                               '''Choose net to be attacked''')
+        target_net = self.screen.get_input("Choose net to be attacked (type its number):")
+
+        args = {"SSID":    self.nets[target_net][1],
+                "BSSID":   self.nets[target_net][2],
+                "Freq":    self.nets[target_net][3],
+                "Channel": self.nets[target_net][4]
+                }
+
+        self.run_attack("rogue_twin", args["SSID"], args)
 
     def null_probe_response(self):
         self.screen.clean()
@@ -148,37 +292,6 @@ class UI:
             })
             target.append(self.devices[i][1])
         self.run_attack("null_probe_response", target, args)
-
-    def rogue_twin(self):
-        self.screen.clean()
-
-        Freq = self.__ask_Freq('''Rogue Twin Attack\n''')
-
-        self.nets = self.sniffer.scan_nets_(Freq)
-
-        while len(self.nets[0]) == 0:
-            self.screen.print_label()
-            self.screen.print_text(f"No nets found at freq {Freq}!")
-            if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
-                self.screen.clean()
-                self.nets = self.sniffer.scan_nets_(Freq)
-            else:
-                return
-
-        self.screen.clean()
-
-        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets,
-                               '''Rogue Twin Attack\n'''
-                               '''Choose net to be attacked''')
-        target_net = self.screen.get_input("Choose net to be attacked (type its number):")
-
-        args = {"SSID":    self.nets[target_net][1],
-                "BSSID":   self.nets[target_net][2],
-                "Freq":    self.nets[target_net][3],
-                "Channel": self.nets[target_net][4]
-                }
-
-        self.run_attack("rogue_twin", args["SSID"], args)
 
     def rts_flood(self):
         self.screen.clean()

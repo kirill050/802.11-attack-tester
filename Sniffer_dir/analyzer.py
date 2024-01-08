@@ -145,13 +145,14 @@ class NPR_Analyzer:
 			self.mutex.release()
 			sleep(self.timeout)
 
-class Deauth_Analyzer:
+class Deauth_Dissasoc_Analyzer:
 
 	targets = ["ff:ff:ff:ff:ff:ff"]
 	mutex = threading.Lock()
 	packets = []
 	TCM_number = 0  # The technological cycle of management
 	timeout = 7
+	subtype = 12
 
 	def __init__(self, **kwargs):
 		for i in kwargs.keys():
@@ -165,7 +166,7 @@ class Deauth_Analyzer:
 			packet = q.get()
 			self.mutex.acquire()
 			if packet.haslayer("Dot11FCS"):
-				if not (packet["Dot11FCS"].type == 0 and packet["Dot11FCS"].subtype == 12):
+				if not (packet["Dot11FCS"].type == 0 and packet["Dot11FCS"].subtype == self.subtype):
 					for target_addr in self.targets:
 						if packet["Dot11FCS"].addr1 == target_addr or packet["Dot11FCS"].addr2 == target_addr or \
 								packet["Dot11FCS"].addr3 == target_addr:

@@ -51,7 +51,29 @@ class sniffer:
             targets.append(device["MAC"])
             if int(device["Channel"]) not in channels:
                 channels.append(int(device["Channel"]))
-        sniffer_main.sniffer_start_Deauth_Analyzer(self.control_int, targets, channels)
+        sniffer_main.sniffer_start_Deauth_Dissasoc_Analyzer(self.control_int, subtype=12,
+                                                            targets=targets, channels=channels)
+
+    def dissasoc(self, args: list[dict]):
+        targets = []
+        channels = []
+        for device in args:
+            targets.append(device["MAC"])
+            if int(device["Channel"]) not in channels:
+                channels.append(int(device["Channel"]))
+        sniffer_main.sniffer_start_Deauth_Dissasoc_Analyzer(self.control_int, subtype=10,
+                                                            targets=targets, channels=channels)
+
+    def omerta_attack(self, args: list[dict]):
+        targets = []
+        channels = []
+        for device in args:
+            if device["BSSID"] not in targets:
+                targets.append(device["BSSID"])
+            if int(device["Channel"]) not in channels:
+                channels.append(int(device["Channel"]))
+        sniffer_main.sniffer_start_Deauth_Dissasoc_Analyzer(self.control_int, subtype=10,
+                                                            targets=targets, channels=channels)
 
 
 

@@ -93,7 +93,7 @@ def sniffer_start_NPR_Analyzer(interface, targets, channels: list[int]):
 	sniffer.exec(prn=MonitorCts)#, timeout=100)
 	print("Started network scanning")
 
-def sniffer_start_Deauth_Analyzer(interface, targets, channels: list[int]):
+def sniffer_start_Deauth_Dissasoc_Analyzer(interface, subtype, targets, channels: list[int]):
 	sniffer = Sniffer(interface)
 
 	if not sniffer.IsMonitor():
@@ -103,7 +103,7 @@ def sniffer_start_Deauth_Analyzer(interface, targets, channels: list[int]):
 	sniffer.SetInterface(interface)
 
 	changing_channels_thread = threading.Thread(target=changing_channels, args=(sniffer, channels, ), daemon=True).start()
-	a = Deauth_Analyzer(targets=targets)
+	a = Deauth_Dissasoc_Analyzer(targets=targets, subtype=subtype)
 	collector_thread = threading.Thread(target=a.Analyzer, args=(packets_q, ), daemon=True).start()
 	printer_thread = threading.Thread(target=a.Printer, args=(targets,), daemon=True).start()
 	sniffer.exec(prn=MonitorCts)#, timeout=100)
