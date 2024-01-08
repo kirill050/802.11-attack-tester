@@ -62,8 +62,8 @@ class UI:
 
         self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets,
                                '''AP association table overflow Attack\n'''
-                               '''Choose nets to be attacked''')
-        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination using commas \",\"):", var_type=str)
+                               '''Choose net(s) to be attacked''')
+        target_nets = self.screen.get_input("Choose net(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         args = []
         target = []
@@ -90,8 +90,8 @@ class UI:
         self.screen.clean()
 
         self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Omerta Attack\n'''
-                                                                                                    '''Choose net to be attacked''')
-        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination using commas \",\"):", var_type=str)
+                                                                                                    '''Choose net(s) to be attacked''')
+        target_nets = self.screen.get_input("Choose net(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         target_info = []
         for net in (target_nets.replace(" ", "")).split(','):
@@ -146,8 +146,8 @@ class UI:
         self.screen.clean()
 
         self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Disassociation Attack\n'''
-                                                                                                    '''Choose net to be attacked''')
-        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination using commas \",\"):", var_type=str)
+                                                                                                    '''Choose net(s) to be attacked''')
+        target_nets = self.screen.get_input("Choose net(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         target_info = []
         for net in (target_nets.replace(" ", "")).split(','):
@@ -171,8 +171,8 @@ class UI:
 
         self.screen.draw_table(["No.", "MAC", "Freq", "Channel", "Net SSID", "Net BSSID"], self.devices,
                                '''Disassociation Attack\n'''
-                               '''Choose device to be attacked''')
-        target_devices = self.screen.get_input("Choose devices to be attacked (print digit or combination using commas \",\"):", var_type=str)
+                               '''Choose device(s) to be attacked''')
+        target_devices = self.screen.get_input("Choose device(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         args = []
         target = []
@@ -199,8 +199,8 @@ class UI:
         self.screen.clean()
 
         self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Deauthentication Attack\n'''
-                                                                                                    '''Choose net to be attacked''')
-        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination using commas \",\"):", var_type=str)
+                                                                                                    '''Choose net(s) to be attacked''')
+        target_nets = self.screen.get_input("Choose net(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         target_info = []
         for net in (target_nets.replace(" ", "")).split(','):
@@ -224,8 +224,8 @@ class UI:
 
         self.screen.draw_table(["No.", "MAC", "Freq", "Channel", "Net SSID", "Net BSSID"], self.devices,
                                '''Deauthentication Attack\n'''
-                               '''Choose device to be attacked''')
-        target_devices = self.screen.get_input("Choose devices to be attacked (print digit or combination using commas \",\"):", var_type=str)
+                               '''Choose device(s) to be attacked''')
+        target_devices = self.screen.get_input("Choose device(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         args = []
         target = []
@@ -291,8 +291,8 @@ class UI:
         self.screen.clean()
 
         self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Null Probe Response Attack\n'''
-                                                                                                    '''Choose net to be attacked''')
-        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination using commas \",\"):", var_type=str)
+                                                                                                    '''Choose net(s) to be attacked''')
+        target_nets = self.screen.get_input("Choose net(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         target_info = []
         for net in (target_nets.replace(" ", "")).split(','):
@@ -316,8 +316,8 @@ class UI:
 
         self.screen.draw_table(["No.", "MAC", "Freq", "Channel", "Net SSID", "Net BSSID"], self.devices,
                                '''Null Probe Response Attack\n'''
-                               '''Choose device to be attacked''')
-        target_devices = self.screen.get_input("Choose devices to be attacked (print digit or combination using commas \",\"):", var_type=str)
+                               '''Choose device(s) to be attacked''')
+        target_devices = self.screen.get_input("Choose device(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
         args = []
         target = []
