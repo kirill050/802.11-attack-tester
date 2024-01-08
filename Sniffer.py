@@ -78,6 +78,15 @@ class sniffer:
                                                             targets=targets, channels=channels,
                                                             attack_name="Omerta Attack")
 
+    def AP_assoc_table_overflow(self, args: list[dict]):
+        targets = []
+        channels = []
+        for net in args:
+            targets.append(net["BSSID"])
+            if int(net["Channel"]) not in channels:
+                channels.append(int(net["Channel"]))
+        sniffer_main.sniffer_start_AP_assoc_table_overflow_Analyzer(self.control_int, targets=targets, channels=channels)
+
 
 
     def __PHY_scan(self, freq):
