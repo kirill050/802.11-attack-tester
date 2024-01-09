@@ -142,7 +142,6 @@ class sniffer:
                 # if err:
                 #     nets.append(["GPON_Home_5G", "D2:9A:D0:0B:66:22", "5", "48", "ac"])
                 #     nets.append(["Ole4ka_5G", "E3:55:EF:16:C5:3D", "5", "111", "ac"])
-                screen.print_text("5 GHz frequency is currently not supported! Work in progress...", "red")
             if freq == "2":  # 6 GHz
                 screen.print_text("Scanning 6 GHz...", "blue")
                 task = progress.add_task("[blue]Scanning 6 GHz...", total=200) # TODO count channels
