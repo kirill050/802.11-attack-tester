@@ -7,7 +7,8 @@ packets_q = queue.Queue()
 
 def ScanNetwork_for_Devices(sniffer: Sniffer, BSSID: str, channel: int):
 	wifiscaner = WIFIScanner(sniffer, BSSID)
-
+	if len(wifiscaner.devices) > 0:
+		wifiscaner.devices.clear()
 	wifiscaner.sniffer.SetChannel(channel)
 	wifiscaner.scan_devices(timeout=10)
 
@@ -16,9 +17,11 @@ def ScanNetwork_for_Devices(sniffer: Sniffer, BSSID: str, channel: int):
 
 def ScanNetworks(sniffer: Sniffer, channels: list[int]):
 	wifiscaner = WIFIScanner(sniffer)
+	if len(wifiscaner.networks) > 0:
+		wifiscaner.networks.clear()
 	for i in channels:
 		wifiscaner.sniffer.SetChannel(i)
-		wifiscaner.scan(timeout=7)
+		wifiscaner.scan(timeout=2)
 
 	networks = wifiscaner.GetNetworksInfo() 
 	# пример итерации по информации о сетях

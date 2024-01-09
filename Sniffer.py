@@ -116,7 +116,7 @@ class sniffer:
                         scan_results = ScanNetworks(sniffer, [i])
                         for ii in scan_results.values():
                             if [ii["SSID"], ii["BSSID"], "2.4", ii["channel"], ii["PWR"], ii["Standart"]] not in nets:
-                                nets.append([ii["SSID"], ii["BSSID"], "2.4", ii["PWR"], ii["Standart"]])
+                                nets.append([ii["SSID"], ii["BSSID"], "2.4", ii["channel"], ii["PWR"], ii["Standart"]])
                     except Exception as e:
                         print(f"Error {e} while scanning chanel {i} on 2.4GHz")
                         err = True
@@ -127,17 +127,17 @@ class sniffer:
                 #     nets.append(["Ole4ka_2G", "E3:55:EF:16:C5:3C", "2.4", "11", "ac"])
             if freq == "1":  # 5 GHz
                 screen.print_text("Scanning 5 GHz...", "green")
-                task = progress.add_task("[green]Scanning 5 GHz...", total=146)
-                for i in range(32, 178, 10):  # For speed added step 10 you may change it
+                task = progress.add_task("[green]Scanning 5 GHz...", total=20)
+                for i in ( list(range(32, 69, 4)) + list(range(132, 145, 4)) + list(range(149, 170, 4))  ):
                     progress.update(task, description=f"[green]Trying channel {i}")
                     try:
                         scan_results = ScanNetworks(sniffer, [i])
                         for ii in scan_results.values():
                             if [ii["SSID"], ii["BSSID"], "5", ii["channel"], ii["PWR"], ii["Standart"]] not in nets:
-                                nets.append([ii["SSID"], ii["BSSID"], "5", ii["PWR"], ii["Standart"]])
+                                nets.append([ii["SSID"], ii["BSSID"], "5", ii["channel"], ii["PWR"], ii["Standart"]])
                     except Exception as e:
                         print(f"Error {e} while scanning chanel {i} on 5 GHz")
-                    progress.update(task, advance=10)
+                    progress.update(task, advance=2)
                     # time.sleep(0.02)
                 # if err:
                 #     nets.append(["GPON_Home_5G", "D2:9A:D0:0B:66:22", "5", "48", "ac"])
@@ -175,6 +175,8 @@ class sniffer:
                 task = progress.add_task("[red]Scanning for devices on 2.4 GHz...",
                                          total=len(target_info))
                 for i in range(len(target_info)):
+                    if target_info[i][1] not in range(1, 14):
+                        continue
                     progress.update(task, description=f"[red]Scanning {target_info[i][2]}:{target_info[i][0]} on channel {target_info[i][1]}...")
                     try:
                         scan_results = ScanNetwork_for_Devices(sniffer, BSSID=target_info[i][0], channel=target_info[i][1])

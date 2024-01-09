@@ -28,8 +28,8 @@ class WIFIScanner:
                     "SSID":     str(SSID),
                     "channel":  str(channel),
                     "BSSID":    str(BSSID),
-                    "PWR":      pwr,
-                    "Standart": standart
+                    "PWR":      str(pwr),
+                    "Standart": str(standart)
                 }
 
     def ScannerDevicesfunc(self, pkt):
@@ -60,18 +60,17 @@ class WIFIScanner:
         if Freq == "2":
             standart = "b"
         elif Freq == "5":
-            standart = "b"
+            standart = "a"
         elif Freq == "6":
             standart = "ax"
         try:
             dot11elt = pkt.getlayer(Dot11Elt)
             while dot11elt:
-                print(dot11elt.ID, dot11elt.info)
-                if int(dot11elt.ID) == 45:  # HT
+                if int(dot11elt.ID) == 45 and (Freq == "2" or Freq == "5"):  # HT
                     standart = "n"
-                if int(dot11elt.ID) == 191:  # VHT
+                if int(dot11elt.ID) == 191 and Freq == "5":  # VHT
                     standart = "ac"
-                if int(dot11elt.ID) == 35:  # HE
+                if int(dot11elt.ID) == 35 and Freq == "6":  # HE
                     standart = "ax"
                 dot11elt = dot11elt.payload.getlayer(Dot11Elt)
         except IndexError:

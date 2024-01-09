@@ -49,7 +49,7 @@ class UI:
 
         self.nets = self.sniffer.scan_nets_(Freq)
 
-        while len(self.nets[0]) == 0:
+        while len(self.nets) == 0:
             self.screen.print_label()
             self.screen.print_text(f"No nets found at freq {Freq}!")
             if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
@@ -99,7 +99,7 @@ class UI:
             target_info.append([self.nets[i][2], self.nets[i][4], self.nets[i][1]])
 
         self.devices = self.sniffer.scan_devices_(Freq, target_info)
-        while len(self.devices[0]) == 0:
+        while len(self.devices) == 0:
             self.screen.print_label()
             nets = []
             for i in range(len((target_nets.replace(" ", "")).split(','))):
@@ -155,7 +155,7 @@ class UI:
             target_info.append([self.nets[i][2], self.nets[i][4], self.nets[i][1]])
 
         self.devices = self.sniffer.scan_devices_(Freq, target_info)
-        while len(self.devices[0]) == 0:
+        while len(self.devices) == 0:
             self.screen.print_label()
             nets = []
             for i in range(len((target_nets.replace(" ", "")).split(','))):
@@ -208,7 +208,7 @@ class UI:
             target_info.append([self.nets[i][2], self.nets[i][4], self.nets[i][1]])
 
         self.devices = self.sniffer.scan_devices_(Freq, target_info)
-        while len(self.devices[0]) == 0:
+        while len(self.devices) == 0:
             self.screen.print_label()
             nets = []
             for i in range(len((target_nets.replace(" ", "")).split(','))):
@@ -248,7 +248,7 @@ class UI:
 
         self.nets = self.sniffer.scan_nets_(Freq)
 
-        while len(self.nets[0]) == 0:
+        while len(self.nets) == 0:
             self.screen.print_label()
             self.screen.print_text(f"No nets found at freq {Freq}!")
             if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
@@ -279,7 +279,7 @@ class UI:
 
 
         self.nets = self.sniffer.scan_nets_(Freq)
-        while len(self.nets[0]) == 0:
+        while len(self.nets) == 0:
             self.screen.print_label()
             self.screen.print_text(f"No nets found at freq {Freq}!")
             if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
@@ -300,7 +300,7 @@ class UI:
             target_info.append([self.nets[i][2], self.nets[i][4], self.nets[i][1]])
 
         self.devices = self.sniffer.scan_devices_(Freq, target_info)
-        while len(self.devices[0]) == 0:
+        while len(self.devices) == 0:
             self.screen.print_label()
             nets = []
             for i in range(len((target_nets.replace(" ", "")).split(','))):
@@ -339,7 +339,7 @@ class UI:
 
         self.nets = self.sniffer.scan_nets_(Freq)
 
-        while len(self.nets[0]) == 0:
+        while len(self.nets) == 0:
             self.screen.print_label()
             self.screen.print_text(f"No nets found at freq {Freq}!")
             if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
@@ -391,11 +391,12 @@ class UI:
         self.screen.clean()
 
         self.frequencies = [["0", "2.4 GHz", "✅"]]
-        self.frequencies.append(["1", "5 GHz", "❌"])
+        self.frequencies.append(["1", "5 GHz", "✅"])
         self.frequencies.append(["2", "6 GHz", "❌"])
 
         self.screen.draw_table(["No.", "F", "Status"], self.frequencies, attack_name+'''Frequency''')
-        Freq = self.screen.get_input("Witch frequency you`d like to attack? (print digit or combination)", str)
+        Freq = self.screen.get_input("Witch frequency you`d like to attack? (print digit or combination using commas \",\")", str)
+        Freq = (Freq.replace(" ", "")).replace(",", "")
         return Freq
 
 
