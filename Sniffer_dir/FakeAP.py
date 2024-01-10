@@ -90,7 +90,8 @@ class AP:
 
 		self.GenerateHostApConfig()
 		os.system(f"hostapd {self.hostapd_config}")
-
+	def __del__(self):
+		self.StopAp()
 
 
 
