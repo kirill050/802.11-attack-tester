@@ -5,8 +5,9 @@ from scapy.all import *
 from scapy.layers.dot11 import *
 from struct import pack
 
-CHANNELS_2GHZ = list(range(1, 13))
-CHANNELS_5GHZ = list(range(36, 64))
+CHANNELS_2GHZ = list(range(1, 14))
+CHANNELS_5GHZ = list(range(32, 69, 4)) + list(range(132, 145, 4)) + list(range(149, 170, 4))
+
 
 
 def ChanelHopper(channel_range: list[int], interface: str, timeout):
