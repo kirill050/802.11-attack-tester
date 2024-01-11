@@ -20,7 +20,7 @@ class UI:
         self.attack_int = attack_int
         self.control_int = control_int
         self.attacks = [self.rts_flood, self.null_probe_response, self.rogue_twin, self.deauth, self.disassoc,
-                        self.Omerta_Attack, self.AP_ass_table_overflow]  # add new attack method here
+                        self.Omerta_Attack, self.AP_ass_table_overflow, self.fake_beacon]  # add new attack method here
         self.attacker = Attacker.attacker(self.attack_int)
         self.sniffer = Sniffer.sniffer(self.control_int, self.attack_int)
 
@@ -35,12 +35,45 @@ class UI:
         raws.append(["5", "Omerta Attack",
                      "Attempts to disconnect clients by sending disassociation frames with a reason code of 0x01 (“unspecified”) to all stations in wireless net"])
         raws.append(["6", "AP association table overflow", "Floods AP with association + authentication requests to overflow association table"])
-        raws.append(["7", "Coming soon", "..."])
+        raws.append(["7", "Beacon Frame Spoofing",
+                     "Spoofs a beacon packet on channels that are different from that advertised in the beacon frame of the AP."])
+        raws.append(["8", "Coming soon", "..."])
         self.screen.draw_table(["No.", "Name", "Brief descr."], raws)
 
         attack = self.screen.get_input("Witch attack you wanna run? (type its number)", int)
         if attack in range(len(self.attacks)):
             self.attacks[attack]()
+
+    def fake_beacon(self):
+        self.screen.clean()
+
+        Freq = self.__ask_Freq('''Beacon Frame Spoofing Attack\n''')
+
+        self.nets = self.sniffer.scan_nets_(Freq)
+
+        while len(self.nets) == 0:
+            self.screen.print_label()
+            self.screen.print_text(f"No nets found at freq {Freq}!")
+            if "y" in (self.screen.get_input("Rescan it? (y/n)", str)).lower():
+                self.screen.clean()
+                self.nets = self.sniffer.scan_nets_(Freq)
+            else:
+                return
+
+        self.screen.clean()
+
+        self.screen.draw_table(["No.", "SSID", "BSSID", "Freq", "Channel", "PWR", "802.11 standart"], self.nets,
+                               '''Beacon Frame Spoofing Attack\n'''
+                               '''Choose net to be attacked''')
+        target_net = self.screen.get_input("Choose net to be attacked (type its number):")
+
+        args = {"SSID":    self.nets[target_net][1],
+                "BSSID":   self.nets[target_net][2],
+                "Freq":    self.nets[target_net][3],
+                "Channel": self.nets[target_net][4]
+                }
+
+        self.run_attack("fake_beacon", args["SSID"], args)
 
     def AP_ass_table_overflow(self):
         self.screen.clean()

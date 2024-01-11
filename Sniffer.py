@@ -87,6 +87,10 @@ class sniffer:
                 channels.append(int(net["Channel"]))
         sniffer_main.sniffer_start_AP_assoc_table_overflow_Analyzer(self.control_int, targets=targets, channels=channels)
 
+    def fake_beacon(self, args: dict):
+        sniffer_main.sniffer_start_Fake_Beacon_Analyzer(self.control_int, BSSID=args["BSSID"], SSID=args["SSID"],
+                                                        channel=int(args["Channel"]))
+
 
 
     def __PHY_scan(self, freq):

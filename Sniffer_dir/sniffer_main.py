@@ -127,3 +127,19 @@ def sniffer_start_AP_assoc_table_overflow_Analyzer(interface, targets, channels:
 	printer_thread = threading.Thread(target=a.Printer, args=(targets, ), daemon=True).start()
 	sniffer.exec(prn=MonitorCts)
 	print("Started network scanning")
+
+def sniffer_start_Fake_Beacon_Analyzer(interface, BSSID, SSID, channel: int):
+	sniffer = Sniffer(interface)
+
+	if not sniffer.IsMonitor():
+		if sniffer.EnableMonitor() is None:
+			print("ERROR enabling monitor mode!!!")
+			return
+	sniffer.SetInterface(interface)
+
+	sniffer.SetChannel(channel)
+	a = Fake_Beacon_Analyzer(BSSID=BSSID)
+	collector_thread = threading.Thread(target=a.Analyzer, args=(packets_q, ), daemon=True).start()
+	printer_thread = threading.Thread(target=a.Printer, args=(BSSID, SSID, ), daemon=True).start()
+	sniffer.exec(prn=MonitorCts)#, timeout=100)
+	print("Started network scanning")

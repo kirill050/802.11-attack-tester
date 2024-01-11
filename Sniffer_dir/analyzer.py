@@ -244,3 +244,49 @@ class AP_assoc_table_overflow_Analyzer:
 
 			self.mutex.release()
 			sleep(self.timeout)
+
+class Fake_Beacon_Analyzer:
+
+	BSSID = "ff:ff:ff:ff:ff:ff"
+	mutex = threading.Lock()
+	packets = []
+	TCM_number = 0  # The technological cycle of management
+	timeout = 7
+
+	def __init__(self, **kwargs):
+		for i in kwargs.keys():
+			if getattr(self, i, None) is not None:
+				setattr(self, i, kwargs[i])
+		self.packets.append(0)
+
+	def Analyzer(self, q: queue.Queue):
+		while True:
+			packet = q.get()
+			self.mutex.acquire()
+			if packet.haslayer("Dot11FCS"):
+				if not (packet["Dot11FCS"].type == 0 and packet["Dot11FCS"].subtype == 8):  # not Beacon
+					if packet["Dot11FCS"].addr1 == self.BSSID or packet["Dot11FCS"].addr2 == self.BSSID or \
+							packet["Dot11FCS"].addr3 == self.BSSID:
+						self.packets[self.TCM_number] += 1
+			self.mutex.release()
+
+	def Printer(self, BSSID, SSID):
+		screen = Drawer.drawer()
+		while True:
+			self.mutex.acquire()
+			plt.clear_data()
+			screen.clean()
+			screen.print_label()
+			screen.print_text(f"Attacking {SSID}:{BSSID} by Beacon Frame Spoofing Attack (type 'q' to stop)")
+
+			plt.plot(self.packets, label=f"{SSID}:{BSSID}")
+			plt.xlabel("Number of the technological cycle of management")
+			plt.ylabel("Number of packets by device")
+			plt.title(f"Attacking {SSID}:{BSSID} by Beacon Frame Spoofing Attack (type 'q' to stop)")
+			plt.show()
+
+			self.packets.append(0)
+			self.TCM_number += 1
+
+			self.mutex.release()
+			sleep(self.timeout)

@@ -4,8 +4,8 @@ from time import sleep
 from scapy.all import *
 from scapy.layers.dot11 import *
 
-CHANNELS_2GHZ = list(range(1, 13))
-CHANNELS_5GHZ = list(range(36, 64))
+CHANNELS_2GHZ = list(range(1, 14))
+CHANNELS_5GHZ = list(range(32, 69, 4)) + list(range(132, 145, 4)) + list(range(149, 170, 4))
 
 
 def ChanelHopper(channel_range: list[int], interface: str, timeout):
@@ -46,7 +46,7 @@ class FakeBeaconAttacker:
     def __init__(self, ssid: str, bssid: str, exclude_channel: int, interface: str, **kwargs):
         self.ssid = ssid
         self.bssid = bssid
-        self.exclude_channel = exclude_channel
+        self.exclude_channel = exclude_channel  # real net channel
         self.interface = interface
         for i in kwargs.keys():
             if getattr(self, i, None) is not None:
