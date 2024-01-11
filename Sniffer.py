@@ -152,10 +152,11 @@ class sniffer:
                         for ii in scan_results.values():
                             # if [ii["SSID"], ii["BSSID"], "5", ii["channel"], ii["PWR"], ii["Standart"]] not in nets:
                             if not self.__net_in_list(ii["BSSID"], ii["SSID"], nets):
-                                nets.append([ii["SSID"], ii["BSSID"], "5", ii["channel"], ii["PWR"], ii["Standart"]])
+                                if int(ii["channel"]) > 31:
+                                    nets.append([ii["SSID"], ii["BSSID"], "5", ii["channel"], ii["PWR"], ii["Standart"]])
                     except Exception as e:
                         print(f"Error {e} while scanning chanel {i} on 5 GHz")
-                    progress.update(task, advance=2)
+                    progress.update(task, advance=1)
                     # time.sleep(0.02)
                 # if err:
                 #     nets.append(["GPON_Home_5G", "D2:9A:D0:0B:66:22", "5", "48", "ac"])
@@ -192,7 +193,7 @@ class sniffer:
                 task = progress.add_task("[red]Scanning for devices on 2.4 GHz...",
                                          total=len(target_info))
                 for i in range(len(target_info)):
-                    if target_info[i][1] not in range(1, 14):
+                    if int(target_info[i][1]) not in range(1, 14):
                         continue
                     progress.update(task, description=f"[red]Scanning {target_info[i][2]}:{target_info[i][0]} on channel {target_info[i][1]}...")
                     try:
@@ -208,7 +209,7 @@ class sniffer:
                 screen.print_text("Scanning for devices on 5 GHz...", "green")
                 task = progress.add_task("[green]Scanning for devices on 5 GHz...", total=len(target_info))
                 for i in range(len(target_info)):
-                    if target_info[i][1] not in range(32, 178):
+                    if int(target_info[i][1]) not in range(32, 178):
                         continue
                     progress.update(task,
                                     description=f"[green]Scanning {target_info[i][2]}:{target_info[i][0]} on channel {target_info[i][1]}...")
@@ -222,7 +223,6 @@ class sniffer:
                     except Exception as e:
                         print(f"Error {e} while scanning {target_info[i][2]}:{target_info[i][0]} on channel {target_info[i][1]} on 5GHz")
                     progress.update(task, advance=1)
-                print("5 GHz frequency is currently not supported! Work in progress...")
                 # if err:
                 #     devices.append(["GPON_Home_5G", "D2:9A:D0:0B:66:22", "5", "48", "ac"])
                 #     devices.append(["Ole4ka_5G", "E3:55:EF:16:C5:3D", "5", "111", "ac"])
