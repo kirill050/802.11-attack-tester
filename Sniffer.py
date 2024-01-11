@@ -91,8 +91,20 @@ class sniffer:
         sniffer_main.sniffer_start_Fake_Beacon_Analyzer(self.control_int, BSSID=args["BSSID"], SSID=args["SSID"],
                                                         channel=int(args["Channel"]))
 
-
-
+    def __net_in_list(self, BSSID, SSID, nets: list[list]):
+        presence = False
+        for i in range(len(nets)):
+            if (BSSID in nets[i]) and (SSID in nets[i]):
+                presence = True
+                break
+        return presence
+    def __device_in_list(self, MAC, BSSID, devices: list[list]):
+        presence = False
+        for i in range(len(devices)):
+            if (BSSID in devices[i]) and (MAC in devices[i]):
+                presence = True
+                break
+        return presence
     def __PHY_scan(self, freq):
         nets = []
 
@@ -119,7 +131,8 @@ class sniffer:
                     try:
                         scan_results = ScanNetworks(sniffer, [i])
                         for ii in scan_results.values():
-                            if [ii["SSID"], ii["BSSID"], "2.4", ii["channel"], ii["PWR"], ii["Standart"]] not in nets:
+                            # if [ii["SSID"], ii["BSSID"], "2.4", ii["channel"], ii["PWR"], ii["Standart"]] not in nets:
+                            if not self.__net_in_list(ii["BSSID"], ii["SSID"], nets):
                                 nets.append([ii["SSID"], ii["BSSID"], "2.4", ii["channel"], ii["PWR"], ii["Standart"]])
                     except Exception as e:
                         print(f"Error {e} while scanning chanel {i} on 2.4GHz")
@@ -137,7 +150,8 @@ class sniffer:
                     try:
                         scan_results = ScanNetworks(sniffer, [i])
                         for ii in scan_results.values():
-                            if [ii["SSID"], ii["BSSID"], "5", ii["channel"], ii["PWR"], ii["Standart"]] not in nets:
+                            # if [ii["SSID"], ii["BSSID"], "5", ii["channel"], ii["PWR"], ii["Standart"]] not in nets:
+                            if not self.__net_in_list(ii["BSSID"], ii["SSID"], nets):
                                 nets.append([ii["SSID"], ii["BSSID"], "5", ii["channel"], ii["PWR"], ii["Standart"]])
                     except Exception as e:
                         print(f"Error {e} while scanning chanel {i} on 5 GHz")
@@ -184,7 +198,8 @@ class sniffer:
                     try:
                         scan_results = ScanNetwork_for_Devices(sniffer, BSSID=target_info[i][0], channel=target_info[i][1])
                         for iii in scan_results:
-                            if [iii, "2.4", target_info[i][1], target_info[i][2], target_info[i][0]] not in devices:
+                            # if [iii, "2.4", target_info[i][1], target_info[i][2], target_info[i][0]] not in devices:
+                            if not self.__device_in_list(iii, target_info[i][0], devices):
                                 devices.append([iii, "2.4", target_info[i][1], target_info[i][2], target_info[i][0]])
                     except Exception as e:
                         print(f"Error {e} while scanning {target_info[i][2]}:{target_info[i][0]} on channel {target_info[i][1]} on 2.4GHz")
@@ -201,7 +216,8 @@ class sniffer:
                         scan_results = ScanNetwork_for_Devices(sniffer, BSSID=target_info[i][0],
                                                                channel=target_info[i][1])
                         for iii in scan_results:
-                            if [iii, "5", target_info[i][1], target_info[i][2], target_info[i][0]] not in devices:
+                            # if [iii, "5", target_info[i][1], target_info[i][2], target_info[i][0]] not in devices:
+                            if not self.__device_in_list(iii, target_info[i][0], devices):
                                 devices.append([iii, "5", target_info[i][1], target_info[i][2], target_info[i][0]])
                     except Exception as e:
                         print(f"Error {e} while scanning {target_info[i][2]}:{target_info[i][0]} on channel {target_info[i][1]} on 5GHz")
