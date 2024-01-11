@@ -66,5 +66,5 @@ class FakeBeaconAttacker:
         t1 = Thread(target=ChanelHopper, args=(channels, self.interface, self.channel_timeout))
         frame = CreateBeacon(ssid=self.ssid, bssid=self.bssid, encryption_enabled=self.encryption)
         t1.start()
-        sendp(frame, iface=self.interface, inter=self.send_interval, loop=1)
+        sendp(frame, iface=self.interface, inter=self.send_interval, loop=1, verbose=0)
         t1.join()
